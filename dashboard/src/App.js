@@ -29,9 +29,7 @@ class App extends Component {
           <header className="App-header" style={{ backgroundImage: `url(${background})` }}>
             <NavBar></NavBar>
             <FileUpload toggle={this.toggleOpen} open={this.state.open}></FileUpload>
-            <Button onClick={this.toggleOpen}>open modal</Button>
             <PopUp show={this.state.open} onHide={this.toggleOpen}></PopUp>
-
           </header>
         </div>
       </div>
