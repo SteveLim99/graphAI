@@ -1,9 +1,6 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import { Modal, Button, ProgressBar } from 'react-bootstrap'
-import arrow from "../images/detection_output_arrow.png";
-import entity from "../images/detection_output_entity.png";
-import networkx from "../images/networkx.png";
 import alternative from "../images/alternative.jpg";
 
 const Styles = styled.div`
@@ -45,14 +42,14 @@ export class PopUp extends Component {
                         </div>
                         <div className="section">
                             <h4>Entity Predictions</h4>
-                            <img src={entity} alt={alternative} className="img-fluid" />
+                            <img src={this.props.entity_img} alt={alternative} className="img-fluid" />
                         </div>
                         <div className="section">
                             <h4>Arrow Predictions</h4>
-                            <img src={arrow} alt={alternative} className="img-fluid" />
+                            <img src={this.props.arrow_img} alt={alternative} className="img-fluid" />
                         </div>
                         <h4>Networkx Conversion</h4>
-                        <img src={networkx} alt={alternative} className="img-fluid" />
+                        <img src={this.props.networkx_img} alt={alternative} className="img-fluid" />
                     </Modal.Body>
                     <Modal.Footer>
                         <Button onClick={this.props.onHide}>Close</Button>

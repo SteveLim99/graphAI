@@ -60,12 +60,17 @@ def upload():
 
             prediction_path = root + "/predictions/"
             paths = os.listdir(prediction_path)
-            encoded_images = []
+            arrow_img = None
+            entity_img = None
+            networkx_img = None
             for path in paths:
-                if(path.endswith(".png")):
-                    encoded_images.append(
-                        get_response_image(prediction_path + path))
-            return jsonify({'images': encoded_images})
+                if(path.endswith("arrow.png")):
+                    arrow_img = get_response_image(prediction_path + path)
+                elif(path.endswith("entity.png")):
+                    entity_img = get_response_image(prediction_path + path)
+                elif(path.endswith("networkx.png")):
+                    networkx_img = get_response_image(prediction_path + path)
+            return jsonify({'arrow_img': arrow_img, "entity_img": entity_img, "networkx_img": networkx_img})
 
 
 def get_response_image(image_path):

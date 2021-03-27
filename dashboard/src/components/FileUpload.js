@@ -79,8 +79,11 @@ export class FileUpload extends Component {
         {}
       );
       if (res.status === 200) {
+        const arr = res.data["arrow_img"];
+        const ent = res.data["entity_img"];
+        const nx = res.data["networkx_img"];
+        this.props.handleImgChanges(arr, ent, nx)
         this.props.toggle();
-        this.state.images = res.data
       }
     } catch (error) {
       alert("File submission error, check console for error message");
