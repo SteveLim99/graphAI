@@ -15,8 +15,6 @@ const Styles = styled.div`
     height: 100%;
     top: 0;
     position: absolute;
-    visibility: hidden;
-    display: none;
     background-color: rgba(22,22,22,0.5);
   }
 `;

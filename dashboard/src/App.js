@@ -24,8 +24,8 @@ class App extends Component {
         <div className="App">
           <header className="App-header" style={{ backgroundImage: `url(${background})` }}>
             <NavBar></NavBar>
-            <FileUpload toggle={this.toggleOpen}></FileUpload>
-            <PopUp toggle={this.togglePop} />
+            <FileUpload toggle={this.toggleOpen} open={this.state.open}></FileUpload>
+            <PopUp></PopUp>
             {this.state.open ? <PopUp toggle={this.togglePop} /> : null}
           </header>
         </div>

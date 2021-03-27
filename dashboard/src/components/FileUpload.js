@@ -16,19 +16,15 @@ const Styles = styled.div`
 
   .form-title{
     font-family: Sans-serif;
-    font-size: 4vw;
+    font-size: 3vw;
     color: #FFFFFF;
     padding-bottom: 6px;
     float: left
   }
 
-  .child{
+  #child{
     position: absolute;
     top: 30vh;
-  }
-  
-  .formStyle{
-    width: 44vw;
   }
 
   .loader {
@@ -41,7 +37,7 @@ const Styles = styled.div`
     margin-left:20px;
     animation: spin 0.35s linear infinite;
   }
-  
+
   @keyframes spin {
     0% {
       transform: rotate(0deg);
@@ -90,32 +86,36 @@ export class FileUpload extends Component {
       alert("File submission error, check console for error message");
       loader.style.display = "none";
     }
+    this.setState({
+      fileUploadLabel: "Attach a File"
+    })
     loader.style.display = "none";
-    form.reset();
+    if (!this.props.open) {
+      form.reset();
+    }
   }
 
   render() {
     return (
       <Styles>
-        <Form className="form-container">
-          <div className="child">
+        <Form className="form-container" id="form-group">
+          <div id="child">
             <h3 className="form-title">Insert File to Get Started</h3>
             <Form.Group
               required
               type="file"
               onChange={this.handleChanges}
               controlId="form-file"
-              className="formStyle"
             >
               <Form.File required type="file" label={this.state.fileUploadLabel} custom />
               <Form.Text id="passwordHelpInline" muted>
                 Uploaded file must be of type .jpeg or .png
-            </Form.Text>
+              </Form.Text>
             </Form.Group>
             <Form.Row>
               <Button variant="outline-light" type="submit" onClick={this.handleSubmit}>
                 Start Prediction
-            </Button>
+              </Button>
               <div className="loader" id="loading"></div>
             </Form.Row>
           </div>
