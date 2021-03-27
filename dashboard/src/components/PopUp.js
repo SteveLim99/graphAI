@@ -1,37 +1,37 @@
 import React, { Component } from "react";
 import styled from "styled-components";
+import { Modal, Button } from 'react-bootstrap'
 
 const Styles = styled.div`
-.modal_content {
-    background-color: white;
-    position: absolute;
-    border-radius: 25px;
-    position: relative;
-    margin: 0 auto;
-  }
-
-  .modal {
-    width: 100%;
-    height: 100%;
-    top: 0;
-    position: absolute;
-    background-color: rgba(22,22,22,0.5);
-  }
 `;
 
-export default class PopUp extends Component {
-    handleClick = () => {
-        this.props.toggle();
-    };
+export class PopUp extends Component {
     render() {
         return (
             <Styles>
-                <div className="modal">
-                    <div className="modal_content">
-                        <span className="close" onClick={this.handleClick}>&times;    </span>
-                        <p>I'm A Pop Up!!!</p>
-                    </div>
-                </div>
+                <Modal
+                    {...this.props}
+                    size="lg"
+                    aria-labelledby="contained-modal-title-vcenter"
+                    centered
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title id="contained-modal-title-vcenter">
+                            Modal heading
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <h4>Centered Modal</h4>
+                        <p>
+                            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
+                            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
+                            consectetur ac, vestibulum at eros.
+                        </p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={this.props.onHide}>Close</Button>
+                    </Modal.Footer>
+                </Modal>
             </Styles>
         );
     }
