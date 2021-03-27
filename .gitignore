@@ -104,6 +104,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.venv_test
 env/
 venv/
 ENV/
@@ -127,3 +128,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Uploads 
+api/uploads/*
+
+# Predictions
+api/predictions/*
+api/arrow_model/
+api/entity_model/
+
+# vscode 
+.vscode
