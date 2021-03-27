@@ -24,8 +24,9 @@ class App extends Component {
   };
 
   handleImgChanges = (arr, ent, nx) => {
+
     this.setState({
-      arrow_img: "data:image/png;base64," + arr,
+      arrow_img: "data:image/png;base64,",
       entity_img: "data:image/png;base64," + ent,
       networkx_img: "data:image/png;base64," + nx
     })

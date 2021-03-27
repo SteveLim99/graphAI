@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import { Modal, Button, ProgressBar } from 'react-bootstrap'
-import alternative from "../images/alternative.jpg";
+import alternative from "../images/alternative.png";
 
 const Styles = styled.div`
     .section{
