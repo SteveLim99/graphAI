@@ -4,19 +4,31 @@ import styled from "styled-components";
 import axios from "axios";
 
 const Styles = styled.div`
+
   .form-container {
-    background-color: #f0f2f5;
     padding: 2%;
     border-radius: 3px;
-    box-shadow: 10px 10px 10px -10px grey;
-    width: 100%;
-    margin-left: 75px;
-    margin-right: 75px;
+    vertical-align: middle;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
   }
+
   .form-title{
     font-family: Sans-serif;
-    color: #6C757D;
-    padding-bottom: 5px;
+    font-size: 4vw;
+    color: #FFFFFF;
+    padding-bottom: 6px;
+    float: left
+  }
+
+  .child{
+    position: absolute;
+    top: 30vh;
+  }
+  
+  .formStyle{
+    width: 44vw;
   }
 
   .loader {
@@ -29,6 +41,7 @@ const Styles = styled.div`
     margin-left:20px;
     animation: spin 0.35s linear infinite;
   }
+  
   @keyframes spin {
     0% {
       transform: rotate(0deg);
@@ -84,25 +97,28 @@ export class FileUpload extends Component {
   render() {
     return (
       <Styles>
-        <Form className="form-container" id="form-group">
-          <h3 className="form-title">Insert File to Get Started</h3>
-          <Form.Group
-            required
-            type="file"
-            onChange={this.handleChanges}
-            controlId="form-file"
-          >
-            <Form.File required type="file" label={this.state.fileUploadLabel} custom />
-            <Form.Text id="passwordHelpInline" muted>
-              Uploaded file must be of type .jpeg or .png
+        <Form className="form-container">
+          <div className="child">
+            <h3 className="form-title">Insert File to Get Started</h3>
+            <Form.Group
+              required
+              type="file"
+              onChange={this.handleChanges}
+              controlId="form-file"
+              className="formStyle"
+            >
+              <Form.File required type="file" label={this.state.fileUploadLabel} custom />
+              <Form.Text id="passwordHelpInline" muted>
+                Uploaded file must be of type .jpeg or .png
             </Form.Text>
-          </Form.Group>
-          <Form.Row>
-            <Button variant="primary" type="submit" onClick={this.handleSubmit}>
-              Submit
+            </Form.Group>
+            <Form.Row>
+              <Button variant="outline-light" type="submit" onClick={this.handleSubmit}>
+                Start Prediction
             </Button>
-            <div className="loader" id="loading"></div>
-          </Form.Row>
+              <div className="loader" id="loading"></div>
+            </Form.Row>
+          </div>
         </Form>
       </Styles>
     )

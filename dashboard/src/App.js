@@ -21,9 +21,9 @@ class App extends Component {
   render() {
     return (
       <div>
-        <NavBar></NavBar>
         <div className="App">
           <header className="App-header" style={{ backgroundImage: `url(${background})` }}>
+            <NavBar></NavBar>
             <FileUpload toggle={this.toggleOpen}></FileUpload>
             <PopUp toggle={this.togglePop} />
             {this.state.open ? <PopUp toggle={this.togglePop} /> : null}
