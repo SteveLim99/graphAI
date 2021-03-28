@@ -73,10 +73,18 @@ def upload():
             return jsonify({'arrow_img': arrow_img, "entity_img": entity_img, "networkx_img": networkx_img})
 
 
+@app.route('/fileDownload', methods=['GET'])
+def download():
+    FILEPATH = os.getcwd() + "/predictions/"
+    FILENAME = "networkx_obj.json"
+    return send_from_directory(directory=FILEPATH, filename=FILENAME)
+
+
 def get_response_image(image_path):
     pil_img = Image.open(image_path, mode='r')  # reads the PIL image
     byte_arr = io.BytesIO()
-    pil_img.save(byte_arr, format='PNG')  # convert the PIL image to byte array
+    # convert the PIL image to byte array
+    pil_img.save(byte_arr, format='PNG')
     encoded_img = encodebytes(byte_arr.getvalue()).decode(
         'ascii')  # encode as base64
     return encoded_img

@@ -5,6 +5,7 @@ import { PopUp } from "./components/PopUp";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { NavBar } from "./components/Navbar"
 import background from "./images/background.png";
+import { Button } from 'react-bootstrap';
 
 class App extends Component {
   constructor() {
@@ -24,7 +25,6 @@ class App extends Component {
   };
 
   handleImgChanges = (arr, ent, nx) => {
-
     this.setState({
       arrow_img: "data:image/png;base64," + arr,
       entity_img: "data:image/png;base64," + ent,
@@ -43,6 +43,7 @@ class App extends Component {
               open={this.state.open}
               handleImgChanges={this.handleImgChanges}>
             </FileUpload>
+            <Button onClick={this.toggleOpen}></Button>
             <PopUp
               show={this.state.open}
               onHide={this.toggleOpen}
@@ -52,7 +53,7 @@ class App extends Component {
             </PopUp>
           </header>
         </div>
-      </div>
+      </div >
     );
   }
 }

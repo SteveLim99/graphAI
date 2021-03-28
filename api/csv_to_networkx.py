@@ -2,6 +2,7 @@ import networkx as nx
 import csv
 import pandas as pd
 import matplotlib.pyplot as plt
+import json
 import os
 
 
@@ -84,4 +85,7 @@ class CsvToNetworkx():
         nx.draw(G, pos, with_labels=True, node_color=color_seq)
         plt.savefig(root + "/predictions/networkx.png")
         plt.close(fig)
+
+        nx.write_gml(G, root + '/predictions/network_obj.gml')
+
         return G

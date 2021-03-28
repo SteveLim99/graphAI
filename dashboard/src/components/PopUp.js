@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import styled from "styled-components";
-import { Modal, Button, ProgressBar } from 'react-bootstrap'
+import { Modal, ProgressBar } from 'react-bootstrap'
 import alternative from "../images/alternative.png";
+import Button from '@material-ui/core/Button';
+import SaveIcon from '@material-ui/icons/Save';
 
 const Styles = styled.div`
     .section{
@@ -41,15 +43,63 @@ export class PopUp extends Component {
                             </p>
                         </div>
                         <div className="section">
-                            <h4>Entity Predictions</h4>
+                            <div className="row">
+                                <div className="col-md-8">
+                                    <h4>Entity Predictions</h4>
+                                </div>
+                                <div className="col-md-4">
+                                    <Button
+                                        variant="outlined"
+                                        color="#000000DE"
+                                        size="small"
+                                        startIcon={<SaveIcon />}
+                                        style={{ float: "right" }}
+                                    >
+                                        Save
+                                    </Button>
+                                </div>
+                            </div>
                             <img src={this.props.entity_img} alt={alternative} className="img-fluid" />
                         </div>
+
                         <div className="section">
-                            <h4>Arrow Predictions</h4>
+                            <div className="row">
+                                <div className="col-md-8">
+                                    <h4>Arrow Predictions</h4>
+                                </div>
+                                <div className="col-md-4">
+                                    <Button
+                                        variant="outlined"
+                                        color="#000000DE"
+                                        size="small"
+                                        startIcon={<SaveIcon />}
+                                        style={{ float: "right" }}
+                                    >
+                                        Save
+                                    </Button>
+                                </div>
+                            </div>
                             <img src={this.props.arrow_img} alt={alternative} className="img-fluid" />
                         </div>
-                        <h4>Networkx Conversion</h4>
-                        <img src={this.props.networkx_img} alt={alternative} className="img-fluid" />
+                        <div className="section">
+                            <div className="row">
+                                <div className="col-md-8">
+                                    <h4>Networkx Conversion</h4>
+                                </div>
+                                <div className="col-md-4">
+                                    <Button
+                                        variant="outlined"
+                                        color="#000000DE"
+                                        size="small"
+                                        startIcon={<SaveIcon />}
+                                        style={{ float: "right" }}
+                                    >
+                                        Save
+                                    </Button>
+                                </div>
+                            </div>
+                            <img src={this.props.networkx_img} alt={alternative} className="img-fluid" />
+                        </div>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button onClick={this.props.onHide}>Close</Button>
