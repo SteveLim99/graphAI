@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Form, Button } from "react-bootstrap";
 import styled from "styled-components";
 import axios from "axios";
+import { LinearProgress } from '@material-ui/core';
 
 const Styles = styled.div`
 
@@ -27,24 +28,10 @@ const Styles = styled.div`
     top: 30vh;
   }
 
-  .loader {
+  .progress-bar{
     display: none;
-    border: 3px solid whitesmoke;
-    border-top: 3px solid #007bff;
-    border-radius: 50%;
-    width: 33px;
-    height: 33px;
-    margin-left:20px;
-    animation: spin 0.35s linear infinite;
+    width: 29vw;
   }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
 `;
 
 export class FileUpload extends Component {
@@ -52,7 +39,8 @@ export class FileUpload extends Component {
     super(props);
     this.state = {
       uploadedFile: null,
-      fileUploadLabel: "Attach a File"
+      fileUploadLabel: "Attach a File",
+      title: "Insert File to Get Started"
     }
   }
 
@@ -66,9 +54,19 @@ export class FileUpload extends Component {
 
   handleSubmit = async e => {
     const loader = document.getElementById("loading");
-    const form = document.querySelector("#form-group");
-    e.preventDefault();
+    const loader_upload = document.getElementById("loading-items");
+    const loader_button = document.getElementById("loading-button");
+
     loader.style.display = "flex";
+    loader_upload.style.display = 'none';
+    loader_button.style.display = 'none';
+
+    this.setState({
+      title: "Generating Prediction"
+    })
+
+    e.preventDefault();
+    const form = document.querySelector("#form-group");
     const { uploadedFile } = this.state;
     const formData = new FormData();
     formData.append("file", uploadedFile);
@@ -90,9 +88,12 @@ export class FileUpload extends Component {
       loader.style.display = "none";
     }
     this.setState({
-      fileUploadLabel: "Attach a File"
+      fileUploadLabel: "Attach a File",
+      title: "Insert File to Get Started"
     })
     loader.style.display = "none";
+    loader_upload.style.display = 'block';
+    loader_button.style.display = 'block';
     if (!this.props.open) {
       form.reset();
     }
@@ -103,23 +104,38 @@ export class FileUpload extends Component {
       <Styles>
         <Form className="form-container" id="form-group">
           <div id="child">
-            <h3 className="form-title">Insert File to Get Started</h3>
+            <h3 className="form-title">{this.state.title}</h3>
             <Form.Group
               required
               type="file"
               onChange={this.handleChanges}
               controlId="form-file"
             >
-              <Form.File required type="file" label={this.state.fileUploadLabel} custom />
-              <Form.Text id="passwordHelpInline" muted>
-                Uploaded file must be of type .jpeg or .png
+              <LinearProgress
+                color='primary'
+                className='progress-bar'
+                id='loading'>
+              </LinearProgress>
+              <div id="loading-items">
+                <Form.File
+                  required type="file"
+                  label={this.state.fileUploadLabel}
+                  custom />
+                <Form.Text
+                  id="passwordHelpInline"
+                  muted>
+                  Uploaded file must be of type .jpeg or .png
               </Form.Text>
+              </div>
             </Form.Group>
             <Form.Row>
-              <Button variant="outline-light" type="submit" onClick={this.handleSubmit}>
+              <Button
+                variant="outline-light"
+                type="submit"
+                onClick={this.handleSubmit}
+                id='loading-button'>
                 Start Prediction
               </Button>
-              <div className="loader" id="loading"></div>
             </Form.Row>
           </div>
         </Form>
