@@ -3,7 +3,7 @@ import io
 from base64 import encodebytes
 from flask import jsonify
 from PIL import Image
-from flask import Flask, flash, request, redirect, url_for
+from flask import Flask, flash, request, redirect, url_for, send_from_directory
 import detect_image
 import csv_to_networkx
 
@@ -73,10 +73,19 @@ def upload():
             return jsonify({'arrow_img': arrow_img, "entity_img": entity_img, "networkx_img": networkx_img})
 
 
-@app.route('/fileDownload', methods=['GET'])
+@app.route('/fileDownload', methods=['POST'])
 def download():
     FILEPATH = os.getcwd() + "/predictions/"
-    FILENAME = "networkx_obj.json"
+    FILENAME = ""
+    id = request.args.get("id")
+    if id == '0':
+        FILENAME = "detection_output_entity.png"
+    elif id == '1':
+        FILENAME = "detection_output_arrow.png"
+    elif id == '2':
+        FILENAME = "network_obj.gml"
+    else:
+        return
     return send_from_directory(directory=FILEPATH, filename=FILENAME)
 
 

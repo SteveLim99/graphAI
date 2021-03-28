@@ -66,7 +66,7 @@ export class FileUpload extends Component {
 
   handleSubmit = async e => {
     const loader = document.getElementById("loading");
-    const form = document.getElementById("#form-group");
+    const form = document.querySelector("#form-group");
     e.preventDefault();
     loader.style.display = "flex";
     const { uploadedFile } = this.state;
