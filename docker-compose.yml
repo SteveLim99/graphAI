@@ -9,7 +9,7 @@ services:
     volumes:
       - ./api:/code
     environment:
-      FLASK_ENV: development
+      FLASK_ENV: production
   frontend:
     container_name: frontend
     build: ./dashboard
