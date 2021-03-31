@@ -8,9 +8,11 @@ import detect_image
 import csv_to_networkx
 
 app = Flask(__name__)
-UPLOAD_FOLDER = os.getcwd() + "/uploads"
+UPLOAD_FOLDER = os.getcwd() + "/data/uploads"
+DOWNLOAD_FOLDER = os.getcwd() + "/data/predictions"
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['DOWNLOAD_FOLDER'] = DOWNLOAD_FOLDER
 
 
 @app.route('/test')
@@ -36,8 +38,8 @@ def upload():
                 PATH_TO_CKPT=root + "/entity_model/new_graph_rcnn/frozen_inference_graph.pb",
                 PATH_TO_LABELS=root + "/entity_model/object-detection.pbtxt",
                 NUM_CLASSES=3,
-                EXPORT_PATH=root + "/predictions",
-                IMAGE_PATH=root + "/uploads/" + "input_file.png",
+                EXPORT_PATH=app.config['DOWNLOAD_FOLDER'],
+                IMAGE_PATH=app.config['UPLOAD_FOLDER'] + "/input_file.png",
                 EXPORT_NAME="detection_output_entity"
             )
 
@@ -46,8 +48,8 @@ def upload():
                 PATH_TO_CKPT=root + "/arrow_model/new_graph_arrow_rcnn/frozen_inference_graph.pb",
                 PATH_TO_LABELS=root + "/arrow_model/object-detection.pbtxt",
                 NUM_CLASSES=1,
-                EXPORT_PATH=root + "/predictions",
-                IMAGE_PATH=root + "/uploads/" + "input_file.png",
+                EXPORT_PATH=app.config['DOWNLOAD_FOLDER'],
+                IMAGE_PATH=app.config['UPLOAD_FOLDER'] + "/input_file.png",
                 EXPORT_NAME="detection_output_arrow"
             )
 
@@ -55,10 +57,10 @@ def upload():
             imgd_entity.predict()
 
             Conv_nx = csv_to_networkx.CsvToNetworkx(
-                CSV_PATH=root + "/predictions/")
+                CSV_PATH=app.config['DOWNLOAD_FOLDER'] + "/")
             G = Conv_nx.convert()
 
-            prediction_path = root + "/predictions/"
+            prediction_path = app.config['DOWNLOAD_FOLDER'] + "/"
             paths = os.listdir(prediction_path)
             arrow_img = None
             entity_img = None
@@ -75,7 +77,7 @@ def upload():
 
 @app.route('/fileDownload', methods=['POST'])
 def download():
-    FILEPATH = os.getcwd() + "/predictions/"
+    FILEPATH = app.config['DOWNLOAD_FOLDER'] + "/"
     FILENAME = ""
     id = request.args.get("id")
     if id == '0':

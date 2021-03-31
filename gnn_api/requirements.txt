@@ -1,0 +1,4 @@
+Flask
+tensorflow==2.4.1
+dgl
+torch

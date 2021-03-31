@@ -83,9 +83,9 @@ class CsvToNetworkx():
         plt.ioff()
         fig = plt.figure()
         nx.draw(G, pos, with_labels=True, node_color=color_seq)
-        plt.savefig(root + "/predictions/networkx.png")
+        plt.savefig(root + "/data/predictions/networkx.png")
         plt.close(fig)
 
-        nx.write_gml(G, root + '/predictions/network_obj.gml')
+        nx.write_gml(G, root + '/data/predictions/network_obj.gml')
 
         return G

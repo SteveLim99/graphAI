@@ -130,10 +130,10 @@ dmypy.json
 .pyre/
 
 # Uploads 
-api/uploads/*
+data/uploads/*
 
 # Predictions
-api/predictions/*
+data/predictions/*
 api/arrow_model/
 api/entity_model/
 

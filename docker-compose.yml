@@ -8,8 +8,21 @@ services:
       - "127.0.0.1:5000:5000"
     volumes:
       - ./api:/code
+      - ./data:/code/data
     environment:
       FLASK_ENV: production
+  gnn_api:
+    container_name: gnn_api
+    build: ./gnn_api
+    ports:
+      - "127.0.0.1:5001:5001"
+    volumes:
+      - ./gnn_api:/code
+      - ./data:/code/data
+    environment:
+      FLASK_ENV: production
+    depends_on:
+      - api
   frontend:
     container_name: frontend
     build: ./dashboard
@@ -22,3 +35,4 @@ services:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - api
+      - gnn_api
