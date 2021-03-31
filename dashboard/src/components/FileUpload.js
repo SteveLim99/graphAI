@@ -70,9 +70,10 @@ export class FileUpload extends Component {
     const { uploadedFile } = this.state;
     const formData = new FormData();
     formData.append("file", uploadedFile);
+
     try {
       var res = await axios.post(
-        "/fileUpload",
+        "/ood/fileUpload",
         formData,
         {}
       );
@@ -81,16 +82,39 @@ export class FileUpload extends Component {
         const ent = res.data["entity_img"];
         const nx = res.data["networkx_img"];
         this.props.handleImgChanges(arr, ent, nx)
+      }
+    } catch (error) {
+      alert("File submission error, check console for error message");
+      loader.style.display = "none";
+    }
+
+    this.setState({
+      title: "Running GNN Model..."
+    })
+
+    try {
+      var gnn_res = await axios.post(
+        "/gnn/gmlUpload",
+        {}
+      );
+
+      if (gnn_res.status === 200) {
+        const pred = gnn_res.data["prediction"];
+        const p0 = gnn_res.data["prob_0"];
+        const p1 = gnn_res.data["probs_1"];
+        this.props.handlePredictionChanges(pred, p0, p1)
         this.props.toggle();
       }
     } catch (error) {
       alert("File submission error, check console for error message");
       loader.style.display = "none";
     }
+
     this.setState({
       fileUploadLabel: "Attach a File",
       title: "Insert File to Get Started"
     })
+
     loader.style.display = "none";
     loader_upload.style.display = 'block';
     loader_button.style.display = 'block';

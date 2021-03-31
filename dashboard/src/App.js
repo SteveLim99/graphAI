@@ -13,7 +13,10 @@ class App extends Component {
       open: false,
       arrow_img: "",
       entity_img: "",
-      networkx_img: ""
+      networkx_img: "",
+      prediction: "",
+      prob_0: "",
+      prob_1: ""
     }
   }
 
@@ -31,6 +34,27 @@ class App extends Component {
     })
   };
 
+  handlePredictionChanges = (pred, p0, p1) => {
+    var float_p0 = parseFloat(p0);
+    var float_p1 = parseFloat(p1);
+
+    if (float_p0 >= 1) {
+      float_p0 = 100
+      float_p1 = 0
+    } else if (float_p1 >= 1) {
+      float_p1 = 100
+      float_p0 = 0
+    } else {
+      float_p1 = Math.round(float_p1 * 100)
+      float_p0 = Math.round(float_p0 * 100)
+    }
+    this.setState({
+      prediction: pred,
+      prob_0: float_p0,
+      prob_1: float_p1
+    })
+  }
+
   render() {
     return (
       <div>
@@ -40,14 +64,18 @@ class App extends Component {
             <FileUpload
               toggle={this.toggleOpen}
               open={this.state.open}
-              handleImgChanges={this.handleImgChanges}>
+              handleImgChanges={this.handleImgChanges}
+              handlePredictionChanges={this.handlePredictionChanges}>
             </FileUpload>
             <PopUp
               show={this.state.open}
               onHide={this.toggleOpen}
               arrow_img={this.state.arrow_img}
               entity_img={this.state.entity_img}
-              networkx_img={this.state.networkx_img}>
+              networkx_img={this.state.networkx_img}
+              prediction={this.state.prediction}
+              prob_0={this.state.prob_0}
+              prob_1={this.state.prob_1}>
             </PopUp>
           </header>
         </div>

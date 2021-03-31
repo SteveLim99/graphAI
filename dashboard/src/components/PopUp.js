@@ -17,7 +17,7 @@ export class PopUp extends Component {
 
     handleSave = async (e, id) => {
         e.preventDefault();
-        const endpoint = '/fileDownload?id=' + String(id);
+        const endpoint = '/ood/fileDownload?id=' + String(id);
         axios({
             url: endpoint,
             method: 'POST',
@@ -56,10 +56,10 @@ export class PopUp extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         <div className="section">
-                            <h4>BPNM</h4>
+                            <h4>{this.props.prediction}</h4>
                             <ProgressBar>
-                                <ProgressBar variant="success" now={50} key={1} />
-                                <ProgressBar variant="danger" now={50} key={2} />
+                                <ProgressBar variant="success" now={this.props.prob_0} key={1} />
+                                <ProgressBar variant="danger" now={this.props.prob_1} key={2} />
                             </ProgressBar>
                             <p>
                                 Business Process Model and Notation is a graphical
