@@ -1,0 +1,1 @@
+Business Process Model and Notation is a graphical representation for specifying business processes in a business process model. Originally developed by the Business Process Management Initiative, BPMN has been maintained by the Object Management Group since the two organizations merged in 2005.

@@ -102,7 +102,8 @@ export class FileUpload extends Component {
         const pred = gnn_res.data["prediction"];
         const p0 = gnn_res.data["prob_0"];
         const p1 = gnn_res.data["probs_1"];
-        this.props.handlePredictionChanges(pred, p0, p1)
+        const content = gnn_res.data["content"];
+        this.props.handlePredictionChanges(pred, p0, p1, content)
         this.props.toggle();
       }
     } catch (error) {

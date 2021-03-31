@@ -11,6 +11,8 @@ GML_MODEL = os.getcwd() + "/gcn_model"
 app.config['GML_MODEL'] = GML_MODEL
 NETWORK_FILE = os.getcwd() + "/data/predictions/network_obj.gml"
 app.config['NETWORK_FILE'] = NETWORK_FILE
+DOCUMENTATION_FILE = os.getcwd() + "/documentation/"
+app.config['DOCUMENTATION_FILE'] = DOCUMENTATION_FILE
 
 
 @app.route('/gmlUpload', methods=['POST'])
@@ -36,4 +38,12 @@ def upload():
     if int_res == 1:
         str_res = "Swimlane"
 
-    return jsonify({'prediction': str_res, 'prob_0': str(np_probs[0]), 'probs_1': str(np_probs[-1])})
+    content = ""
+    if str_res == "BPNM":
+        with open(app.config['DOCUMENTATION_FILE'] + "bpnm.txt", "r") as f:
+            content = f.read()
+    else:
+        with open(app.config['DOCUMENTATION_FILE'] + "swimlane.txt", "r") as f:
+            content = f.read()
+
+    return jsonify({'prediction': str_res, 'prob_0': str(np_probs[0]), 'probs_1': str(np_probs[-1]), 'content': content})

@@ -62,11 +62,7 @@ export class PopUp extends Component {
                                 <ProgressBar variant="danger" now={this.props.prob_1} key={2} />
                             </ProgressBar>
                             <p>
-                                Business Process Model and Notation is a graphical
-                                representation for specifying business processes in a business process model.
-                                Originally developed by the Business Process Management Initiative,
-                                BPMN has been maintained by the Object Management Group since the
-                                two organizations merged in 2005.
+                                {this.props.content}
                             </p>
                         </div>
                         <div className="section">

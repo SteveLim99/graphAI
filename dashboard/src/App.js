@@ -16,7 +16,8 @@ class App extends Component {
       networkx_img: "",
       prediction: "",
       prob_0: "",
-      prob_1: ""
+      prob_1: "",
+      content: ""
     }
   }
 
@@ -34,7 +35,7 @@ class App extends Component {
     })
   };
 
-  handlePredictionChanges = (pred, p0, p1) => {
+  handlePredictionChanges = (pred, p0, p1, content) => {
     var float_p0 = parseFloat(p0);
     var float_p1 = parseFloat(p1);
 
@@ -51,7 +52,8 @@ class App extends Component {
     this.setState({
       prediction: pred,
       prob_0: float_p0,
-      prob_1: float_p1
+      prob_1: float_p1,
+      content: content
     })
   }
 
@@ -75,7 +77,8 @@ class App extends Component {
               networkx_img={this.state.networkx_img}
               prediction={this.state.prediction}
               prob_0={this.state.prob_0}
-              prob_1={this.state.prob_1}>
+              prob_1={this.state.prob_1}
+              content={this.state.content}>
             </PopUp>
           </header>
         </div>
