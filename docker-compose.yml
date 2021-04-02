@@ -1,6 +1,37 @@
 version: "3.7"
 
 services:
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    restart: always
+    env_file:
+      - ./env/database.env
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db/pgdata:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    env_file:
+      - ./env/pgadmin.env
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+  db_api:
+    container_name: db_api
+    build: ./db_api
+    ports:
+      - "127.0.0.1:5002:5002"
+    volumes:
+      - ./db_api:/code
+      - ./data:/code/data
+    environment:
+      FLASK_ENV: development
+    depends_on:
+      - postgres
   api:
     container_name: api
     build: ./api
@@ -11,6 +42,8 @@ services:
       - ./data:/code/data
     environment:
       FLASK_ENV: production
+    depends_on:
+      - postgres
   gnn_api:
     container_name: gnn_api
     build: ./gnn_api
@@ -22,6 +55,7 @@ services:
     environment:
       FLASK_ENV: production
     depends_on:
+      - postgres
       - api
   frontend:
     container_name: frontend
@@ -34,5 +68,6 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
+      - postgres
       - api
       - gnn_api
