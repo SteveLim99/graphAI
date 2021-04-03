@@ -140,9 +140,6 @@ class App extends Component {
             <IconButton
               onClick={this.updateTable}
               color="inherit"
-              style={{
-                paddingBottom: "12px"
-              }}
             >
               {this.state.viewPast ?
                 <EjectOutlinedIcon fontSize="large" />

@@ -11,7 +11,7 @@ const Styles = styled.div`
     border-radius: 3px;
     vertical-align: middle;
     width: 100vw;
-    height: 100vh;
+    height: 87vh;
     position: relative;
   }
 
