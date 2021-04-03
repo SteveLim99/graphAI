@@ -21,4 +21,14 @@ module.exports = function (app) {
             }
         })
     );
+    app.use(
+        '/db',
+        createProxyMiddleware({
+            target: 'http://db_api:5002',
+            changeOrigin: true,
+            pathRewrite: {
+                '^/db': ''
+            }
+        })
+    );
 };

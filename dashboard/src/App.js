@@ -4,7 +4,9 @@ import { FileUpload } from "./components/FileUpload";
 import { PopUp } from "./components/PopUp";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { NavBar } from "./components/Navbar"
+import { DBTable } from "./components/DBTable";
 import background from "./images/background.png";
+import axios from "axios";
 
 class App extends Component {
   constructor() {
@@ -17,9 +19,38 @@ class App extends Component {
       prediction: "",
       prob_0: "",
       prob_1: "",
-      content: ""
+      content: "",
+      files: []
     }
   }
+
+  getDBFiles = () => {
+    axios.get("/db/dbConnect")
+      .then(res => {
+        const db_files_id = res.data["files_id"]
+        const db_files_name = res.data["files_name"]
+        const db_files_arr = res.data["files_arr"]
+        const db_files_ent = res.data["files_ent"]
+        const db_files_nx = res.data["files_nx"]
+        var db_files = []
+
+        for (var i = 0; i < db_files_id.length(); i++) {
+          var file = {
+            "files_id": db_files_id[i],
+            "files_name": db_files_name[i],
+            "files_arr": db_files_arr[i],
+            "files_ent": db_files_ent[i],
+            "files_nx": db_files_nx[i]
+          }
+          db_files.push(file)
+        }
+        return db_files
+      })
+      .catch(error => {
+        console.log(error)
+        alert("Error occured when fetching files from DB, check console for error message")
+      })
+  };
 
   toggleOpen = () => {
     this.setState({
@@ -57,6 +88,12 @@ class App extends Component {
     })
   }
 
+  componentDidMount = async () => {
+    this.setState({
+      files: this.getDBFiles()
+    });
+  }
+
   render() {
     return (
       <div>
@@ -69,6 +106,9 @@ class App extends Component {
               handleImgChanges={this.handleImgChanges}
               handlePredictionChanges={this.handlePredictionChanges}>
             </FileUpload>
+            <DBTable
+              docs={this.state.files}>
+            </DBTable>
             <PopUp
               show={this.state.open}
               onHide={this.toggleOpen}

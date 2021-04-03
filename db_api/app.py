@@ -54,17 +54,20 @@ def connectToDB():
                 cursor.execute(statement)
                 rows = cursor.fetchall()
 
-                files = []
+                files_id = []
+                files_name = []
                 file_img_arr = []
                 file_img_ent = []
                 file_img_nx = []
                 for row in rows:
+                    db_id = row[0]
                     db_name = row[1]
                     db_arr = row[2]
                     db_ent = row[3]
                     db_nx = row[4]
 
-                    files.append(db_name)
+                    files_id.append(db_id)
+                    files_name.append(db_name)
                     if db_arr != None:
                         file_img_arr.append(db_arr)
                     else:
@@ -81,7 +84,8 @@ def connectToDB():
                         file_img_nx.append("")
 
                 res = {
-                    "files": files,
+                    "files_id": files_id,
+                    "files_name": files_name,
                     "files_arr": file_img_arr,
                     "files_ent": file_img_ent,
                     "files_nx": file_img_nx
