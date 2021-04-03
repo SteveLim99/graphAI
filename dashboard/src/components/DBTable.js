@@ -15,10 +15,10 @@ const Styles = styled.div`
 
 export class DBTable extends Component {
 
-    handleShowModalButton = (e, arr, ent, nx) => {
+    handleShowModalButton = (e, arr, ent, nx, pred, probs, context) => {
         e.preventDefault();
         this.props.handleImgChanges(arr, ent, nx);
-        this.props.handlePredictionChanges("test", 0, 1, "test")
+        this.props.handlePredictionChanges(pred, probs[0], probs[1], context)
         this.props.toggle();
     }
 
@@ -39,6 +39,13 @@ export class DBTable extends Component {
                 sortDirections: ["descend", "ascend"]
             },
             {
+                title: "Graph Type",
+                dataIndex: "files_gtype",
+                sorter: (a, b) => a.files_gtype.length - b.files_gtype.length,
+                ellipsis: true,
+                sortDirections: ["descend", "ascend"]
+            },
+            {
                 title: "Toggle Modal",
                 key: 'action',
                 render: (text, record) => (
@@ -46,7 +53,15 @@ export class DBTable extends Component {
                         variant="outlined"
                         color="default"
                         size="small"
-                        onClick={(e) => { this.handleShowModalButton(e, record.files_arr, record.files_ent, record.files_nx) }}
+                        onClick={(e) => {
+                            this.handleShowModalButton(e,
+                                record.files_arr,
+                                record.files_ent,
+                                record.files_nx,
+                                record.files_gtype,
+                                record.files_probs,
+                                record.files_context)
+                        }}
                     >
                         Load Modal
                     </Button>
