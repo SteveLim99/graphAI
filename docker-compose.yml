@@ -13,17 +13,17 @@ services:
       - ./db/pgdata:/var/lib/postgresql/data
       - ./db/schema_init.sql:/docker-entrypoint-initdb.d/1_init.sql
       - ./db/data_init.sql:/docker-entrypoint-initdb.d/2_data_init.sql
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    env_file:
-      - ./env/pgadmin.env
-    ports:
-      - "8080:80"
-    depends_on:
-      - postgres
-    logging:
-      driver: "none"
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pgadmin
+  #   env_file:
+  #     - ./env/pgadmin.env
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     - postgres
+  #   logging:
+  #     driver: "none"
   db_api:
     container_name: db_api
     build: ./db_api
@@ -75,3 +75,4 @@ services:
       - postgres
       - api
       - gnn_api
+      - db_api

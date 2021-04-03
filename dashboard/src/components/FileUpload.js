@@ -126,6 +126,7 @@ export class FileUpload extends Component {
       if (db_res.status === 200) {
         console.log("DB Updated")
       }
+      this.props.updateTable();
       this.props.toggle();
     } catch (error) {
       console.log(error)

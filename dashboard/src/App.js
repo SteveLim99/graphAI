@@ -24,7 +24,8 @@ class App extends Component {
       prob_1: "",
       content: "",
       isUpload: true,
-      files: []
+      files: [],
+      viewPast: false
     }
   }
 
@@ -103,23 +104,23 @@ class App extends Component {
     })
   }
 
-  handlePrevUploads = (e) => {
-    e.preventDefault();
-    this.setState({
-      viewPast: !this.state.viewPast
-    })
-  }
-
   handleIsUpload = (bool) => {
     this.setState({
       isUpload: bool
     })
   }
 
-  componentDidMount = async () => {
-    this.setState({
-      files: await this.getDBFiles()
-    });
+  updateTable = async () => {
+    if (!this.state.viewPast) {
+      this.setState({
+        files: await this.getDBFiles(),
+        viewPast: !this.state.viewPast
+      });
+    } else {
+      this.setState({
+        viewPast: !this.state.viewPast
+      });
+    }
   }
 
   render() {
@@ -133,10 +134,11 @@ class App extends Component {
               open={this.state.open}
               handleImgChanges={this.handleImgChanges}
               handlePredictionChanges={this.handlePredictionChanges}
-              handleIsUpload={this.handleIsUpload}>
+              handleIsUpload={this.handleIsUpload}
+              updateTable={this.updateTable}>
             </FileUpload>
             <IconButton
-              onClick={(e) => { this.handlePrevUploads(e) }}
+              onClick={this.updateTable}
               color="inherit"
               style={{
                 paddingBottom: "12px"
