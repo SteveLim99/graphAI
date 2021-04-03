@@ -23,6 +23,7 @@ class App extends Component {
       prob_0: "",
       prob_1: "",
       content: "",
+      isUpload: true,
       files: []
     }
   }
@@ -109,6 +110,12 @@ class App extends Component {
     })
   }
 
+  handleIsUpload = (bool) => {
+    this.setState({
+      isUpload: bool
+    })
+  }
+
   componentDidMount = async () => {
     this.setState({
       files: await this.getDBFiles()
@@ -125,7 +132,8 @@ class App extends Component {
               toggle={this.toggleOpen}
               open={this.state.open}
               handleImgChanges={this.handleImgChanges}
-              handlePredictionChanges={this.handlePredictionChanges}>
+              handlePredictionChanges={this.handlePredictionChanges}
+              handleIsUpload={this.handleIsUpload}>
             </FileUpload>
             <IconButton
               onClick={(e) => { this.handlePrevUploads(e) }}
@@ -149,7 +157,8 @@ class App extends Component {
               prediction={this.state.prediction}
               prob_0={this.state.prob_0}
               prob_1={this.state.prob_1}
-              content={this.state.content}>
+              content={this.state.content}
+              isUpload={this.state.isUpload}>
             </PopUp>
             {this.state.viewPast ?
               <DBTable
@@ -158,7 +167,8 @@ class App extends Component {
                 onHide={this.toggleOpen}
                 handleImgChanges={this.handleImgChanges}
                 docs={this.state.files}
-                handlePredictionChanges={this.handlePredictionChanges}>
+                handlePredictionChanges={this.handlePredictionChanges}
+                handleIsUpload={this.handleIsUpload}>
               </DBTable>
               :
               null

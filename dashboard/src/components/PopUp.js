@@ -70,18 +70,22 @@ export class PopUp extends Component {
                                 <div className="col-md-8">
                                     <h4>Entity Predictions</h4>
                                 </div>
-                                <div className="col-md-4">
-                                    <Button
-                                        variant="outlined"
-                                        color="default"
-                                        size="small"
-                                        startIcon={<SaveIcon />}
-                                        style={{ float: "right" }}
-                                        onClick={(e) => { this.handleSave(e, 0) }}
-                                    >
-                                        Save
-                                    </Button>
-                                </div>
+                                {this.props.isUpload ?
+                                    <div className="col-md-4">
+                                        <Button
+                                            variant="outlined"
+                                            color="default"
+                                            size="small"
+                                            startIcon={<SaveIcon />}
+                                            style={{ float: "right" }}
+                                            onClick={(e) => { this.handleSave(e, 0) }}
+                                        >
+                                            Save
+                                        </Button>
+                                    </div>
+                                    :
+                                    null
+                                }
                             </div>
                             <img src={this.props.entity_img} alt={alternative} className="img-fluid" />
                         </div>
@@ -91,18 +95,22 @@ export class PopUp extends Component {
                                 <div className="col-md-8">
                                     <h4>Arrow Predictions</h4>
                                 </div>
-                                <div className="col-md-4">
-                                    <Button
-                                        variant="outlined"
-                                        color="default"
-                                        size="small"
-                                        startIcon={<SaveIcon />}
-                                        style={{ float: "right" }}
-                                        onClick={(e) => { this.handleSave(e, 1) }}
-                                    >
-                                        Save
-                                    </Button>
-                                </div>
+                                {this.props.isUpload ?
+                                    <div className="col-md-4">
+                                        <Button
+                                            variant="outlined"
+                                            color="default"
+                                            size="small"
+                                            startIcon={<SaveIcon />}
+                                            style={{ float: "right" }}
+                                            onClick={(e) => { this.handleSave(e, 1) }}
+                                        >
+                                            Save
+                                        </Button>
+                                    </div>
+                                    :
+                                    null
+                                }
                             </div>
                             <img src={this.props.arrow_img} alt={alternative} className="img-fluid" />
                         </div>
@@ -111,18 +119,23 @@ export class PopUp extends Component {
                                 <div className="col-md-8">
                                     <h4>Networkx Conversion</h4>
                                 </div>
-                                <div className="col-md-4">
-                                    <Button
-                                        variant="outlined"
-                                        color="default"
-                                        size="small"
-                                        startIcon={<SaveIcon />}
-                                        style={{ float: "right" }}
-                                        onClick={(e) => { this.handleSave(e, 2) }}
-                                    >
-                                        Save
-                                    </Button>
-                                </div>
+                                {this.props.isUpload ?
+                                    <div className="col-md-4">
+                                        <Button
+                                            variant="outlined"
+                                            color="default"
+                                            size="small"
+                                            startIcon={<SaveIcon />}
+                                            style={{ float: "right" }}
+                                            onClick={(e) => { this.handleSave(e, 2) }}
+                                        >
+                                            Save
+                                        </Button>
+                                    </div>
+                                    :
+                                    null
+                                }
+
                             </div>
                             <img src={this.props.networkx_img} alt={alternative} className="img-fluid" />
                         </div>

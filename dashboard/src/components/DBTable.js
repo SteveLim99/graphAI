@@ -19,6 +19,7 @@ export class DBTable extends Component {
         e.preventDefault();
         this.props.handleImgChanges(arr, ent, nx);
         this.props.handlePredictionChanges(pred, probs[0], probs[1], context)
+        this.props.handleIsUpload(false);
         this.props.toggle();
     }
 

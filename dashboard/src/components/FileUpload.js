@@ -92,6 +92,9 @@ export class FileUpload extends Component {
       title: "Running GNN Model..."
     })
 
+    var pred = ""
+    var p0 = ""
+    var p1 = ""
     try {
       var gnn_res = await axios.post(
         "/gnn/gmlUpload",
@@ -99,14 +102,33 @@ export class FileUpload extends Component {
       );
 
       if (gnn_res.status === 200) {
-        const pred = gnn_res.data["prediction"];
-        const p0 = gnn_res.data["prob_0"];
-        const p1 = gnn_res.data["probs_1"];
+        pred = gnn_res.data["prediction"];
+        p0 = gnn_res.data["prob_0"];
+        p1 = gnn_res.data["probs_1"];
         const content = gnn_res.data["content"];
         this.props.handlePredictionChanges(pred, p0, p1, content)
-        this.props.toggle();
+        this.props.handleIsUpload(true);
       }
     } catch (error) {
+      alert("File submission error, check console for error message");
+    }
+
+    try {
+      const pred_endpoint = "?pred=" + pred;
+      const bpnm_prob_endpoint = "&BPNM=" + p0;
+      const swimlane_prob_endpoint = "&Swimlane=" + p1;
+      const endpoint = "/db/dbConnect" + pred_endpoint + bpnm_prob_endpoint + swimlane_prob_endpoint;
+      var db_res = await axios.post(
+        endpoint,
+        {}
+      )
+
+      if (db_res.status === 200) {
+        console.log("DB Updated")
+      }
+      this.props.toggle();
+    } catch (error) {
+      console.log(error)
       alert("File submission error, check console for error message");
       loader.style.display = "none";
     }
