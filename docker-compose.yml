@@ -20,6 +20,8 @@ services:
       - "8080:80"
     depends_on:
       - postgres
+    logging:
+      driver: "none"
   db_api:
     container_name: db_api
     build: ./db_api

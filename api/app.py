@@ -31,6 +31,10 @@ def upload():
         if file and validateFileExtension(file.filename):
             file.save(os.path.join(
                 app.config['UPLOAD_FOLDER'], "input_file.png"))
+            file_name = open(os.path.join(
+                app.config['UPLOAD_FOLDER'], "file_name.txt"), 'w')
+            file_name.write(file.filename)
+            file_name.close()
             root = os.getcwd()
 
             imgd_entity = detect_image.ImageDetect(

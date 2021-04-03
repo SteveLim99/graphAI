@@ -39,6 +39,9 @@ class App extends Component {
         const db_files_arr = res.data["files_arr"]
         const db_files_ent = res.data["files_ent"]
         const db_files_nx = res.data["files_nx"]
+        const db_files_gtype = res.data["files_gtype"]
+        const db_files_probs = res.data["files_probs"]
+        const db_files_context = res.data["files_context"]
 
         for (var i = 0; i < db_files_id.length; i++) {
           var file = {
@@ -46,7 +49,10 @@ class App extends Component {
             "files_name": db_files_name[i],
             "files_arr": db_files_arr[i],
             "files_ent": db_files_ent[i],
-            "files_nx": db_files_nx[i]
+            "files_nx": db_files_nx[i],
+            "files_context": db_files_context[i],
+            "files_gtype": db_files_gtype[i],
+            "files_probs": db_files_probs[i]
           }
           db_files.push(file)
         }
