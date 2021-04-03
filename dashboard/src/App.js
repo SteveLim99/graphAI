@@ -6,6 +6,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { NavBar } from "./components/Navbar"
 import { DBTable } from "./components/DBTable";
 import background from "./images/background.png";
+import ArrowDropDownCircleOutlinedIcon from '@material-ui/icons/ArrowDropDownCircleOutlined';
+import IconButton from '@material-ui/core/IconButton';
+import EjectOutlinedIcon from '@material-ui/icons/EjectOutlined';
 import axios from "axios";
 
 class App extends Component {
@@ -24,17 +27,20 @@ class App extends Component {
     }
   }
 
-  getDBFiles = () => {
-    axios.get("/db/dbConnect")
-      .then(res => {
+  getDBFiles = async () => {
+    var db_files = []
+
+    try {
+      var res = await axios.get("/db/dbConnect");
+
+      if (res.status === 200) {
         const db_files_id = res.data["files_id"]
         const db_files_name = res.data["files_name"]
         const db_files_arr = res.data["files_arr"]
         const db_files_ent = res.data["files_ent"]
         const db_files_nx = res.data["files_nx"]
-        var db_files = []
 
-        for (var i = 0; i < db_files_id.length(); i++) {
+        for (var i = 0; i < db_files_id.length; i++) {
           var file = {
             "files_id": db_files_id[i],
             "files_name": db_files_name[i],
@@ -44,12 +50,14 @@ class App extends Component {
           }
           db_files.push(file)
         }
-        return db_files
-      })
-      .catch(error => {
-        console.log(error)
-        alert("Error occured when fetching files from DB, check console for error message")
-      })
+
+      }
+    } catch (error) {
+      console.log(error)
+      alert("DB Fetching error, check console for error message");
+    } finally {
+      return db_files;
+    }
   };
 
   toggleOpen = () => {
@@ -88,9 +96,16 @@ class App extends Component {
     })
   }
 
+  handlePrevUploads = (e) => {
+    e.preventDefault();
+    this.setState({
+      viewPast: !this.state.viewPast
+    })
+  }
+
   componentDidMount = async () => {
     this.setState({
-      files: this.getDBFiles()
+      files: await this.getDBFiles()
     });
   }
 
@@ -106,9 +121,19 @@ class App extends Component {
               handleImgChanges={this.handleImgChanges}
               handlePredictionChanges={this.handlePredictionChanges}>
             </FileUpload>
-            <DBTable
-              docs={this.state.files}>
-            </DBTable>
+            <IconButton
+              onClick={(e) => { this.handlePrevUploads(e) }}
+              color="inherit"
+              style={{
+                paddingBottom: "12px"
+              }}
+            >
+              {this.state.viewPast ?
+                <EjectOutlinedIcon fontSize="large" />
+                :
+                <ArrowDropDownCircleOutlinedIcon fontSize="large" />
+              }
+            </IconButton>
             <PopUp
               show={this.state.open}
               onHide={this.toggleOpen}
@@ -120,6 +145,18 @@ class App extends Component {
               prob_1={this.state.prob_1}
               content={this.state.content}>
             </PopUp>
+            {this.state.viewPast ?
+              <DBTable
+                toggle={this.toggleOpen}
+                open={this.state.open}
+                onHide={this.toggleOpen}
+                handleImgChanges={this.handleImgChanges}
+                docs={this.state.files}
+                handlePredictionChanges={this.handlePredictionChanges}>
+              </DBTable>
+              :
+              null
+            }
           </header>
         </div>
       </div >

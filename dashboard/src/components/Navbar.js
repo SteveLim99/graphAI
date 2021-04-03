@@ -20,7 +20,7 @@ export class NavBar extends Component {
         return (
             <Styles>
                 <Navbar className="navbar" >
-                    <Navbar.Brand href="#home" className="navbar-text">Graph AI</Navbar.Brand>
+                    <Navbar.Brand className="navbar-text">Graph AI</Navbar.Brand>
                 </Navbar>
             </Styles>
         )

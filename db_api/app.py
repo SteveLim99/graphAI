@@ -82,7 +82,6 @@ def connectToDB():
                         file_img_nx.append(db_nx)
                     else:
                         file_img_nx.append("")
-
                 res = {
                     "files_id": files_id,
                     "files_name": files_name,
