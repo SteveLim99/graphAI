@@ -25,6 +25,7 @@ services:
   #   logging:
   #     driver: "none"
   db_api:
+    # image: 127.0.0.1:5000/db_api
     container_name: db_api
     build: ./db_api
     ports:
@@ -37,6 +38,7 @@ services:
     depends_on:
       - postgres
   api:
+    # image: 127.0.0.1:5000/api
     container_name: api
     build: ./api
     ports:
@@ -49,6 +51,7 @@ services:
     depends_on:
       - postgres
   gnn_api:
+    # image: 127.0.0.1:5000/gnn_api
     container_name: gnn_api
     build: ./gnn_api
     ports:
@@ -62,6 +65,7 @@ services:
       - postgres
       - api
   frontend:
+    # image: 127.0.0.1:5000/frontend
     container_name: frontend
     build: ./dashboard
     volumes:
