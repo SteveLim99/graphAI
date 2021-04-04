@@ -54,14 +54,15 @@ services:
       - postgres
       - api
   frontend_prod:
+    image: 127.0.0.1:3000/frontend_prod
     container_name: frontend_prod
     build:
       context: ./dashboard
       dockerfile: Dockerfile.prod
     ports:
       - "3000:80"
-    depends_on:
-      - postgres
-      - api
-      - gnn_api
-      - db_api
+    # depends_on:
+    #   - postgres
+    #   - api
+    #   - gnn_api
+    #   - db_api
