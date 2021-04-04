@@ -61,8 +61,8 @@ services:
       dockerfile: Dockerfile.prod
     ports:
       - "3000:80"
-    # depends_on:
-    #   - postgres
-    #   - api
-    #   - gnn_api
-    #   - db_api
+    depends_on:
+      - postgres
+      - api
+      - gnn_api
+      - db_api
