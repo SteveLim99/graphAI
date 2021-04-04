@@ -13,6 +13,10 @@ $ npm install --global yarn
 ```
 $ docker-compose up
 ```
+5. Removing the containers 
+```
+$ docker-compose down
+```
  
 ## Deploying the Production Environment to Docker Swarm
 1. Create a file called "env" at ./ and enter the environmental variables as specified in ./env_example. There are two files to edit:
@@ -47,13 +51,18 @@ container_id   graphai_webapp_gnn_api         replicated   1/1        127.0.0.1:
 container_id   graphai_webapp_postgres        replicated   1/1        postgres:alpine                       *:5432->5432/tcp
 ```
 - The container_id should ressemble a hash
+7. Removing the swarm service
+```
+$ docker stack rm graphai_webapp
+$ docker swarm leave -f
+```
 
 ## Scalling using Docker Swarm
 1. Run the following command 
 ```
-$ docker service scale <service_name>=2
+$ docker service scale <service_name>=<scale_to_value>
 ```
-2. <service_name> should represent the service you want to scale, for example, if we wish to scale the microservice communicating with the database, we can run the following command
+2. <service_name> should represent the service you want to scale and <scale_to_value> would represent the amount of services we wish to replicate. For example, if we wish to scale the microservice communicating with the database to 2, we can run the following command. 
 ```
 $ docker service scale graphai_webapp_db_api=2
 ```
