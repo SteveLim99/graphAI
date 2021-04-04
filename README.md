@@ -81,3 +81,14 @@ $ docker service logs <service_name>
 ```
 $ docker service logs graphai_webapp_db_api
 ```
+
+## Using pgAdmin4 to Access the PostgreSQL Service. [ONLY USE IN DEVELOPMENT ENV]
+1. In ./docker-compose.yml, uncomment the pgadmin service
+2. Run the following command 
+```
+$ docker-compose up
+```
+3. To stop the pgAdmin4 service. Run the following command.
+```
+$ docker-compose stop pgadmin
+```
