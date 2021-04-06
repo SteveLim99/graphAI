@@ -25,7 +25,8 @@ class App extends Component {
       content: "",
       isUpload: true,
       files: [],
-      viewPast: false
+      viewPast: false,
+      rowID: ""
     }
   }
 
@@ -81,6 +82,12 @@ class App extends Component {
       networkx_img: "data:image/png;base64," + nx
     })
   };
+
+  handleRowID = (id) => {
+    this.setState({
+      rowID: id
+    })
+  }
 
   handlePredictionChanges = (pred, p0, p1, content) => {
     var float_p0 = parseFloat(p0);
@@ -157,7 +164,8 @@ class App extends Component {
               prob_0={this.state.prob_0}
               prob_1={this.state.prob_1}
               content={this.state.content}
-              isUpload={this.state.isUpload}>
+              isUpload={this.state.isUpload}
+              rowID={this.state.rowID}>
             </PopUp>
             {this.state.viewPast ?
               <DBTable
@@ -167,7 +175,8 @@ class App extends Component {
                 handleImgChanges={this.handleImgChanges}
                 docs={this.state.files}
                 handlePredictionChanges={this.handlePredictionChanges}
-                handleIsUpload={this.handleIsUpload}>
+                handleIsUpload={this.handleIsUpload}
+                handleRowID={this.handleRowID}>
               </DBTable>
               :
               null

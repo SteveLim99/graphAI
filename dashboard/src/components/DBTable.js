@@ -15,11 +15,12 @@ const Styles = styled.div`
 
 export class DBTable extends Component {
 
-    handleShowModalButton = (e, arr, ent, nx, pred, probs, context) => {
+    handleShowModalButton = (e, arr, ent, nx, pred, probs, context, id) => {
         e.preventDefault();
         this.props.handleImgChanges(arr, ent, nx);
         this.props.handlePredictionChanges(pred, probs[0], probs[1], context)
         this.props.handleIsUpload(false);
+        this.props.handleRowID(id);
         this.props.toggle();
     }
 
@@ -61,7 +62,8 @@ export class DBTable extends Component {
                                 record.files_nx,
                                 record.files_gtype,
                                 record.files_probs,
-                                record.files_context)
+                                record.files_context,
+                                record.files_id)
                         }}
                     >
                         Load Modal
