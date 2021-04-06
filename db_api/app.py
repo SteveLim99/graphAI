@@ -50,8 +50,8 @@ def connectToDB():
                 nx_img = encode_img(
                     app.config['DOWNLOAD_FOLDER'] + "networkx.png")
 
-                date = datetime.today().strftime('%Y-%m-%d')
-                statement = "INSERT INTO files(name, input_date) VALUES(%s, to_date(%s, 'YYYY-MM-DD')) RETURNING id"
+                date = datetime.today().strftime('%Y-%m-%d  %H:%M:%S')
+                statement = "INSERT INTO files(name, input_date) VALUES(%s, TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS')) RETURNING id"
                 cursor.execute(statement, (file_name, date, ))
                 file_id = cursor.fetchone()[0]
 
@@ -91,6 +91,7 @@ def connectToDB():
 
                 files_id = []
                 files_name = []
+                files_date = []
                 file_img_arr = []
                 file_img_ent = []
                 file_img_nx = []
@@ -100,15 +101,17 @@ def connectToDB():
                 for row in rows:
                     db_id = row[0]
                     db_name = row[1]
-                    db_gtype = row[2]
-                    db_context = row[3]
-                    db_arr = row[4]
-                    db_ent = row[5]
-                    db_nx = row[6]
-                    db_probs = [str(i) for i in row[7]]
+                    db_date = row[2]
+                    db_gtype = row[3]
+                    db_context = row[4]
+                    db_arr = row[5]
+                    db_ent = row[6]
+                    db_nx = row[7]
+                    db_probs = [str(i) for i in row[8]]
 
                     files_id.append(db_id)
                     files_name.append(db_name)
+                    files_date.append(db_date)
                     files_gtype.append(db_gtype)
                     files_context.append(db_context)
                     files_probs.append(db_probs)
@@ -131,6 +134,7 @@ def connectToDB():
                 res = {
                     "files_id": files_id,
                     "files_name": files_name,
+                    "files_date": files_date,
                     "files_arr": file_img_arr,
                     "files_ent": file_img_ent,
                     "files_nx": file_img_nx,

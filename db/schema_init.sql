@@ -20,7 +20,7 @@ SET row_security = off;
 -- Name: getall(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.getall() RETURNS TABLE(id integer, name character varying, input_date date, gtype character varying, context text, arr text, ent text, nx text, probs numeric[])
+CREATE FUNCTION public.getall() RETURNS TABLE(id integer, name character varying, input_date timestamp without time zone, gtype character varying, context text, arr text, ent text, nx text, probs numeric[])
     LANGUAGE plpgsql
     AS $$
 	begin 
@@ -78,7 +78,7 @@ ALTER TABLE public.downloads OWNER TO postgres;
 CREATE TABLE public.files (
     id integer NOT NULL,
     name character varying(255) NOT NULL,
-    input_date date
+    input_date timestamp without time zone
 );
 
 

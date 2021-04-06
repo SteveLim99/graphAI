@@ -39,6 +39,7 @@ class App extends Component {
       if (res.status === 200) {
         const db_files_id = res.data["files_id"]
         const db_files_name = res.data["files_name"]
+        const db_files_date = res.data["files_date"]
         const db_files_arr = res.data["files_arr"]
         const db_files_ent = res.data["files_ent"]
         const db_files_nx = res.data["files_nx"]
@@ -50,6 +51,7 @@ class App extends Component {
           var file = {
             "files_id": db_files_id[i],
             "files_name": db_files_name[i],
+            "files_date": db_files_date[i],
             "files_arr": db_files_arr[i],
             "files_ent": db_files_ent[i],
             "files_nx": db_files_nx[i],

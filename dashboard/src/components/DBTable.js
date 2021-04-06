@@ -48,6 +48,13 @@ export class DBTable extends Component {
                 sortDirections: ["descend", "ascend"]
             },
             {
+                title: "Upload Date",
+                dataIndex: "files_date",
+                sorter: (a, b) => new Date(a.files_date) - new Date(b.files_date),
+                ellipsis: true,
+                sortDirections: ["descend", "ascend"]
+            },
+            {
                 title: "Toggle Modal",
                 key: 'action',
                 render: (text, record) => (
