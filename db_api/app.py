@@ -51,8 +51,8 @@ def connectToDB():
                     app.config['DOWNLOAD_FOLDER'] + "networkx.png")
 
                 date = datetime.today().strftime('%Y-%m-%d')
-                statement = "INSERT INTO files(name) VALUES(%s) RETURNING id"
-                cursor.execute(statement, (file_name,))
+                statement = "INSERT INTO files(name, input_date) VALUES(%s, to_date(%s, 'YYYY-MM-DD')) RETURNING id"
+                cursor.execute(statement, (file_name, date, ))
                 file_id = cursor.fetchone()[0]
 
                 statement = "INSERT INTO images(id, arr, ent, nx) VALUES(%s, %s, %s, %s)"
