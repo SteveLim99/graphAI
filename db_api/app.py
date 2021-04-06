@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2.extensions import AsIs
 from secrets import host, database, user, password
 from flask import Flask, flash, request, redirect, url_for, send_file
 import os
@@ -158,11 +159,18 @@ def downloadFileFromDB():
     
     while retries != max_retry:
         try:
-            if file_type == 0 or file_type == 1 or file_type == 2:
+            if file_type == '0' or file_type == '1' or file_type == '2':
                 file = ""
-                if file_type == 0: file = "arr_file"
-                if file_type == 1: file = "ent_file"
-                if file_type == 2: file = "nx_file"
+                filename = str(graph_id) + "_"
+                if file_type == '0': 
+                    file = "arr_file"
+                    filename += "arrow.png"
+                if file_type == '1': 
+                    file = "ent_file"
+                    filename += "entity.png"
+                if file_type == '2': 
+                    file = "nx_file"
+                    filename += "nx_obj.gml"
 
                 conn = psycopg2.connect(
                     host=host,
@@ -171,14 +179,15 @@ def downloadFileFromDB():
                     password=password
                 )
                 cursor = conn.cursor()
-
+                
                 statement = "SELECT %s FROM downloads where id = %s"
-                cursor.execute(statement, (file_type, graph_id,))
+                cursor.execute(statement, (AsIs(file), graph_id,))
                 bdata = cursor.fetchone()[0]
+                
                 return send_file(
                     io.BytesIO(bdata),
                     as_attachment=True,
-                    attachment_filename="test.png"
+                    attachment_filename=filename
                 )
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
