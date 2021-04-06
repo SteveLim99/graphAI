@@ -77,7 +77,8 @@ ALTER TABLE public.downloads OWNER TO postgres;
 
 CREATE TABLE public.files (
     id integer NOT NULL,
-    name character varying(255) NOT NULL
+    name character varying(255) NOT NULL,
+    input_date date
 );
 
 
