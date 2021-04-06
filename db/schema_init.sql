@@ -20,12 +20,12 @@ SET row_security = off;
 -- Name: getall(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.getall() RETURNS TABLE(id integer, name character varying, gtype character varying, context text, arr text, ent text, nx text, probs numeric[])
+CREATE FUNCTION public.getall() RETURNS TABLE(id integer, name character varying, input_date date, gtype character varying, context text, arr text, ent text, nx text, probs numeric[])
     LANGUAGE plpgsql
     AS $$
 	begin 
 		return query 
-			select files.id, files.name, g.gtype, g.context, im.arr, im.ent, im.nx, p.probs from files
+			select files.id, files.name, files.input_date, g.gtype, g.context, im.arr, im.ent, im.nx, p.probs from files
 			left join(
 				select prediction.id, gt.gtype, gt.context from prediction
 				left join(
