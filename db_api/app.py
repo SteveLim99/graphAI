@@ -7,6 +7,7 @@ import io
 from base64 import encodebytes
 from PIL import Image
 from data.graphs import graphs
+from datetime import datetime
 import sys
 
 app = Flask(__name__)
@@ -49,6 +50,7 @@ def connectToDB():
                 nx_img = encode_img(
                     app.config['DOWNLOAD_FOLDER'] + "networkx.png")
 
+                date = datetime.today().strftime('%Y-%m-%d')
                 statement = "INSERT INTO files(name) VALUES(%s) RETURNING id"
                 cursor.execute(statement, (file_name,))
                 file_id = cursor.fetchone()[0]
@@ -74,7 +76,8 @@ def connectToDB():
                     nx_binary_data = psycopg2.Binary(nx_file)
 
                     statement = "INSERT INTO downloads(id, arr_file, ent_file, nx_file) VALUES (%s, %s, %s, %s)"
-                    cursor.execute(statement, (file_id, arr_binary_data, ent_binary_data, nx_binary_data, ))
+                    cursor.execute(
+                        statement, (file_id, arr_binary_data, ent_binary_data, nx_binary_data, ))
 
                 conn.commit()
                 processed = True
@@ -147,6 +150,7 @@ def connectToDB():
         conn.close()
     return res
 
+
 @app.route('/dbGetFile',  methods=['GET'])
 def downloadFileFromDB():
     graph_id = request.args.get("id")
@@ -156,19 +160,19 @@ def downloadFileFromDB():
     max_retry = 5
     conn = None
     res = {}
-    
+
     while retries != max_retry:
         try:
             if file_type == '0' or file_type == '1' or file_type == '2':
                 file = ""
                 filename = str(graph_id) + "_"
-                if file_type == '0': 
+                if file_type == '0':
                     file = "arr_file"
                     filename += "arrow.png"
-                if file_type == '1': 
+                if file_type == '1':
                     file = "ent_file"
                     filename += "entity.png"
-                if file_type == '2': 
+                if file_type == '2':
                     file = "nx_file"
                     filename += "nx_obj.gml"
 
@@ -179,11 +183,11 @@ def downloadFileFromDB():
                     password=password
                 )
                 cursor = conn.cursor()
-                
+
                 statement = "SELECT %s FROM downloads where id = %s"
                 cursor.execute(statement, (AsIs(file), graph_id,))
                 bdata = cursor.fetchone()[0]
-                
+
                 return send_file(
                     io.BytesIO(bdata),
                     as_attachment=True,
@@ -199,6 +203,7 @@ def downloadFileFromDB():
         conn.close()
     return res
 
+
 def encode_img(image_path):
     pil_img = Image.open(image_path, mode='r')  # reads the PIL image
     byte_arr = io.BytesIO()
@@ -208,20 +213,24 @@ def encode_img(image_path):
         'ascii')  # encode as base64
     return encoded_img
 
+
 def readFiles():
     arr_fin, ent_fin, nx_fin = None, None, None
     arr_file, ent_file, nx_file = None, None, None
     res = None
 
     try:
-        arr_fin = open((app.config['DOWNLOAD_FOLDER'] + "detection_output_arrow.png"), "rb")
-        ent_fin = open((app.config['DOWNLOAD_FOLDER'] + "detection_output_entity.png"), "rb")
-        nx_fin = open((app.config['DOWNLOAD_FOLDER'] + "network_obj.gml"), "rb")
+        arr_fin = open(
+            (app.config['DOWNLOAD_FOLDER'] + "detection_output_arrow.png"), "rb")
+        ent_fin = open(
+            (app.config['DOWNLOAD_FOLDER'] + "detection_output_entity.png"), "rb")
+        nx_fin = open(
+            (app.config['DOWNLOAD_FOLDER'] + "network_obj.gml"), "rb")
 
         arr_file = arr_fin.read()
         ent_file = ent_fin.read()
         nx_file = nx_fin.read()
-        
+
         res = [arr_file, ent_file, nx_file]
     except IOError as e:
         print(f'Error {e.args[0]}, {e.args[1]}')
