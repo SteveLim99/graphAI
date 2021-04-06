@@ -58,6 +58,20 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: downloads; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.downloads (
+    id integer NOT NULL,
+    arr_file bytea,
+    ent_file bytea,
+    nx_file bytea
+);
+
+
+ALTER TABLE public.downloads OWNER TO postgres;
+
+--
 -- Name: files; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -165,6 +179,14 @@ ALTER TABLE public.probability ALTER COLUMN idx ADD GENERATED ALWAYS AS IDENTITY
 
 
 --
+-- Name: downloads downloads_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.downloads
+    ADD CONSTRAINT downloads_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: files files_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -202,6 +224,14 @@ ALTER TABLE ONLY public.prediction
 
 ALTER TABLE ONLY public.probability
     ADD CONSTRAINT probability_pkey PRIMARY KEY (idx);
+
+
+--
+-- Name: downloads downloads_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.downloads
+    ADD CONSTRAINT downloads_id_fkey FOREIGN KEY (id) REFERENCES public.files(id);
 
 
 --
