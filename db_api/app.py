@@ -1,11 +1,12 @@
 import psycopg2
 from secrets import host, database, user, password
-from flask import Flask, flash, request, redirect, url_for, send_from_directory
+from flask import Flask, flash, request, redirect, url_for, send_file
 import os
 import io
 from base64 import encodebytes
 from PIL import Image
 from data.graphs import graphs
+import sys
 
 app = Flask(__name__)
 
@@ -62,6 +63,17 @@ def connectToDB():
                     probs = round(float(request.args.get(key)), 2)
                     gid = graphs[key]
                     cursor.execute(statement, (file_id, gid, probs,))
+
+                tmp = readFiles()
+
+                if tmp:
+                    arr_file, ent_file, nx_file = tmp
+                    arr_binary_data = psycopg2.Binary(arr_file)
+                    ent_binary_data = psycopg2.Binary(ent_file)
+                    nx_binary_data = psycopg2.Binary(nx_file)
+
+                    statement = "INSERT INTO downloads(id, arr_file, ent_file, nx_file) VALUES (%s, %s, %s, %s)"
+                    cursor.execute(statement, (file_id, arr_binary_data, ent_binary_data, nx_binary_data, ))
 
                 conn.commit()
                 processed = True
@@ -134,6 +146,49 @@ def connectToDB():
         conn.close()
     return res
 
+@app.route('/dbGetFile',  methods=['GET'])
+def downloadFileFromDB():
+    graph_id = request.args.get("id")
+    file_type = request.args.get("file")
+
+    retries = 0
+    max_retry = 5
+    conn = None
+    res = {}
+    
+    while retries != max_retry:
+        try:
+            if file_type == 0 or file_type == 1 or file_type == 2:
+                file = ""
+                if file_type == 0: file = "arr_file"
+                if file_type == 1: file = "ent_file"
+                if file_type == 2: file = "nx_file"
+
+                conn = psycopg2.connect(
+                    host=host,
+                    database=database,
+                    user=user,
+                    password=password
+                )
+                cursor = conn.cursor()
+
+                statement = "SELECT %s FROM downloads where id = %s"
+                cursor.execute(statement, (file_type, graph_id,))
+                bdata = cursor.fetchone()[0]
+                return send_file(
+                    io.BytesIO(bdata),
+                    as_attachment=True,
+                    attachment_filename="test.png"
+                )
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+            retries += 1
+            if conn:
+                conn.rollback()
+            print("Retry Attempt: " + str(retries) + " / " + str(max_retry))
+    if conn:
+        conn.close()
+    return res
 
 def encode_img(image_path):
     pil_img = Image.open(image_path, mode='r')  # reads the PIL image
@@ -143,3 +198,30 @@ def encode_img(image_path):
     encoded_img = encodebytes(byte_arr.getvalue()).decode(
         'ascii')  # encode as base64
     return encoded_img
+
+def readFiles():
+    arr_fin, ent_fin, nx_fin = None, None, None
+    arr_file, ent_file, nx_file = None, None, None
+    res = None
+
+    try:
+        arr_fin = open((app.config['DOWNLOAD_FOLDER'] + "detection_output_arrow.png"), "rb")
+        ent_fin = open((app.config['DOWNLOAD_FOLDER'] + "detection_output_entity.png"), "rb")
+        nx_fin = open((app.config['DOWNLOAD_FOLDER'] + "network_obj.gml"), "rb")
+
+        arr_file = arr_fin.read()
+        ent_file = ent_fin.read()
+        nx_file = nx_fin.read()
+        
+        res = [arr_file, ent_file, nx_file]
+    except IOError as e:
+        print(f'Error {e.args[0]}, {e.args[1]}')
+        sys.exit(1)
+    finally:
+        if arr_fin:
+            arr_fin.close()
+        if ent_fin:
+            ent_fin.close()
+        if nx_fin:
+            nx_fin.close()
+        return res
