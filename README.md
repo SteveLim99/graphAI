@@ -99,7 +99,7 @@ $ docker service logs graphai_webapp_db_api
 ```
 2. Run the following command 
 ```
-$ docker-compose up
+$ docker-compose up pgadmin
 ```
 3. To stop the pgAdmin4 service. Run the following command.
 ```
