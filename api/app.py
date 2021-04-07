@@ -79,22 +79,6 @@ def upload():
             return jsonify({'arrow_img': arrow_img, "entity_img": entity_img, "networkx_img": networkx_img})
 
 
-@app.route('/fileDownload', methods=['POST'])
-def download():
-    FILEPATH = app.config['DOWNLOAD_FOLDER'] + "/"
-    FILENAME = ""
-    id = request.args.get("id")
-    if id == '0':
-        FILENAME = "detection_output_entity.png"
-    elif id == '1':
-        FILENAME = "detection_output_arrow.png"
-    elif id == '2':
-        FILENAME = "network_obj.gml"
-    else:
-        return
-    return send_from_directory(directory=FILEPATH, filename=FILENAME)
-
-
 def get_response_image(image_path):
     pil_img = Image.open(image_path, mode='r')  # reads the PIL image
     byte_arr = io.BytesIO()
