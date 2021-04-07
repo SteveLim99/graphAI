@@ -3,6 +3,7 @@ import { Table } from 'antd';
 import "antd/dist/antd.css";
 import styled from "styled-components";
 import Button from '@material-ui/core/Button';
+import { SearchBar } from './SearchBar';
 
 const Styles = styled.div`
 
@@ -79,6 +80,11 @@ export class DBTable extends Component {
         ];
         return (
             <Styles>
+                <SearchBar
+                    handleSearchKeyword={this.props.handleSearchKeyword}
+                    handleSearchSelect={this.props.handleSearchSelect}
+                    handleSearchDates={this.props.handleSearchDates}>
+                </SearchBar>
                 <Table
                     columns={columns}
                     pagination={{ showSizeChanger: true }}

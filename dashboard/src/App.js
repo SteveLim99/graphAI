@@ -25,7 +25,11 @@ class App extends Component {
       content: "",
       files: [],
       viewPast: false,
-      rowID: ""
+      rowID: "",
+      search_keyword: null,
+      search_sDate: null,
+      search_eDate: null,
+      search_gType: null
     }
   }
 
@@ -87,6 +91,31 @@ class App extends Component {
   handleRowID = (id) => {
     this.setState({
       rowID: id
+    })
+  }
+
+  handleSearchKeyword = (e) => {
+    e.preventDefault();
+    const val = e.target.value;
+    console.log(val)
+    this.setState({
+      search_keyword: val
+    })
+  }
+
+  handleSearchSelect = (e) => {
+    console.log(e)
+    this.setState({
+      search_gType: e
+    })
+  }
+
+  handleSearchDates = (dateString) => {
+    const start = dateString[0]
+    const end = dateString[1]
+    this.setState({
+      search_sDate: start,
+      search_eDate: end,
     })
   }
 
@@ -169,7 +198,10 @@ class App extends Component {
                 handleImgChanges={this.handleImgChanges}
                 docs={this.state.files}
                 handlePredictionChanges={this.handlePredictionChanges}
-                handleRowID={this.handleRowID}>
+                handleRowID={this.handleRowID}
+                handleSearchKeyword={this.handleSearchKeyword}
+                handleSearchSelect={this.handleSearchSelect}
+                handleSearchDates={this.handleSearchDates}>
               </DBTable>
               :
               null
