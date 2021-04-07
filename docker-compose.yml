@@ -61,6 +61,13 @@ services:
     depends_on:
       - postgres
       - api
+  # redis:
+  #   image: redis:6-alpine
+  #   depends_on:
+  #     - postgres
+  #     - api
+  #     - gnn_api
+  #     - db_api
   frontend:
     container_name: frontend
     build: ./dashboard
@@ -76,3 +83,4 @@ services:
       - api
       - gnn_api
       - db_api
+      # - redis

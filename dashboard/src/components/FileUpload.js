@@ -107,7 +107,6 @@ export class FileUpload extends Component {
         p1 = gnn_res.data["probs_1"];
         const content = gnn_res.data["content"];
         this.props.handlePredictionChanges(pred, p0, p1, content)
-        this.props.handleIsUpload(true);
       }
     } catch (error) {
       alert("File submission error, check console for error message");
@@ -125,6 +124,8 @@ export class FileUpload extends Component {
 
       if (db_res.status === 200) {
         console.log("DB Updated")
+        const graphID = db_res.data["graphID"]
+        this.props.handleRowID(graphID)
       }
       this.props.updateTable();
       this.props.toggle();

@@ -81,7 +81,7 @@ def connectToDB():
 
                 conn.commit()
                 processed = True
-                res = {"fileUploaded": str(processed)}
+                res = {"fileUploaded": str(processed), "graphID": str(file_id)}
                 break
 
             elif request.method == 'GET':

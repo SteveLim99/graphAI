@@ -23,7 +23,6 @@ class App extends Component {
       prob_0: "",
       prob_1: "",
       content: "",
-      isUpload: true,
       files: [],
       viewPast: false,
       rowID: ""
@@ -113,12 +112,6 @@ class App extends Component {
     })
   }
 
-  handleIsUpload = (bool) => {
-    this.setState({
-      isUpload: bool
-    })
-  }
-
   updateTable = async () => {
     if (!this.state.viewPast) {
       this.setState({
@@ -143,8 +136,8 @@ class App extends Component {
               open={this.state.open}
               handleImgChanges={this.handleImgChanges}
               handlePredictionChanges={this.handlePredictionChanges}
-              handleIsUpload={this.handleIsUpload}
-              updateTable={this.updateTable}>
+              updateTable={this.updateTable}
+              handleRowID={this.handleRowID}>
             </FileUpload>
             <IconButton
               onClick={this.updateTable}
@@ -166,7 +159,6 @@ class App extends Component {
               prob_0={this.state.prob_0}
               prob_1={this.state.prob_1}
               content={this.state.content}
-              isUpload={this.state.isUpload}
               rowID={this.state.rowID}>
             </PopUp>
             {this.state.viewPast ?
@@ -177,7 +169,6 @@ class App extends Component {
                 handleImgChanges={this.handleImgChanges}
                 docs={this.state.files}
                 handlePredictionChanges={this.handlePredictionChanges}
-                handleIsUpload={this.handleIsUpload}
                 handleRowID={this.handleRowID}>
               </DBTable>
               :

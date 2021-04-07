@@ -15,31 +15,6 @@ const Styles = styled.div`
 
 export class PopUp extends Component {
 
-    handleSave = async (e, id) => {
-        e.preventDefault();
-        const endpoint = '/ood/fileDownload?id=' + String(id);
-        axios({
-            url: endpoint,
-            method: 'POST',
-            responseType: 'blob'
-        }).then((response) => {
-            let fileName = "undefined";
-            if (id === 0) {
-                fileName = "entity.png";
-            } else if (id === 1) {
-                fileName = "arrow.png";
-            } else if (id === 2) {
-                fileName = "networkx_obj.gml"
-            }
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', fileName);
-            document.body.appendChild(link);
-            link.click();
-        });
-    }
-
     handleSaveFromDB = async (e, id, file) => {
         e.preventDefault();
         var endpoint = '/db/dbGetFile?id=' + String(id);
@@ -97,31 +72,16 @@ export class PopUp extends Component {
                                     <h4>Entity Predictions</h4>
                                 </div>
                                 <div className="col-md-4">
-                                    {this.props.isUpload ?
-
-                                        <Button
-                                            variant="outlined"
-                                            color="default"
-                                            size="small"
-                                            startIcon={<SaveIcon />}
-                                            style={{ float: "right" }}
-                                            onClick={(e) => { this.handleSave(e, 0) }}
-                                        >
-                                            Save
-                                        </Button>
-
-                                        :
-                                        <Button
-                                            variant="outlined"
-                                            color="default"
-                                            size="small"
-                                            startIcon={<SaveIcon />}
-                                            style={{ float: "right" }}
-                                            onClick={(e) => { this.handleSaveFromDB(e, this.props.rowID, 1) }}
-                                        >
-                                            Save
-                                        </Button>
-                                    }
+                                    <Button
+                                        variant="outlined"
+                                        color="default"
+                                        size="small"
+                                        startIcon={<SaveIcon />}
+                                        style={{ float: "right" }}
+                                        onClick={(e) => { this.handleSaveFromDB(e, this.props.rowID, 2) }}
+                                    >
+                                        Save
+                                    </Button>
                                 </div>
                             </div>
                             <img src={this.props.entity_img} alt={alternative} className="img-fluid" />
@@ -133,29 +93,16 @@ export class PopUp extends Component {
                                     <h4>Arrow Predictions</h4>
                                 </div>
                                 <div className="col-md-4">
-                                    {this.props.isUpload ?
-                                        <Button
-                                            variant="outlined"
-                                            color="default"
-                                            size="small"
-                                            startIcon={<SaveIcon />}
-                                            style={{ float: "right" }}
-                                            onClick={(e) => { this.handleSave(e, 1) }}
-                                        >
-                                            Save
-                                        </Button>
-                                        :
-                                        <Button
-                                            variant="outlined"
-                                            color="default"
-                                            size="small"
-                                            startIcon={<SaveIcon />}
-                                            style={{ float: "right" }}
-                                            onClick={(e) => { this.handleSaveFromDB(e, this.props.rowID, 0) }}
-                                        >
-                                            Save
+                                    <Button
+                                        variant="outlined"
+                                        color="default"
+                                        size="small"
+                                        startIcon={<SaveIcon />}
+                                        style={{ float: "right" }}
+                                        onClick={(e) => { this.handleSaveFromDB(e, this.props.rowID, 0) }}
+                                    >
+                                        Save
                                     </Button>
-                                    }
                                 </div>
                             </div>
                             <img src={this.props.arrow_img} alt={alternative} className="img-fluid" />
@@ -166,29 +113,16 @@ export class PopUp extends Component {
                                     <h4>Networkx Conversion</h4>
                                 </div>
                                 <div className="col-md-4">
-                                    {this.props.isUpload ?
-                                        <Button
-                                            variant="outlined"
-                                            color="default"
-                                            size="small"
-                                            startIcon={<SaveIcon />}
-                                            style={{ float: "right" }}
-                                            onClick={(e) => { this.handleSave(e, 2) }}
-                                        >
-                                            Save
-                                        </Button>
-                                        :
-                                        <Button
-                                            variant="outlined"
-                                            color="default"
-                                            size="small"
-                                            startIcon={<SaveIcon />}
-                                            style={{ float: "right" }}
-                                            onClick={(e) => { this.handleSaveFromDB(e, this.props.rowID, 2) }}
-                                        >
-                                            Save
-                                        </Button>
-                                    }
+                                    <Button
+                                        variant="outlined"
+                                        color="default"
+                                        size="small"
+                                        startIcon={<SaveIcon />}
+                                        style={{ float: "right" }}
+                                        onClick={(e) => { this.handleSaveFromDB(e, this.props.rowID, 2) }}
+                                    >
+                                        Save
+                                    </Button>
                                 </div>
                             </div>
                             <img src={this.props.networkx_img} alt={alternative} className="img-fluid" />
