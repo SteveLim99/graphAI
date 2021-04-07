@@ -85,8 +85,19 @@ def connectToDB():
                 break
 
             elif request.method == 'GET':
-                statement = "select * from getAll()"
-                cursor.execute(statement)
+                statement = "select * from getAll(keyword:=%s, start_year:=%s, end_year:=%s, graph_type:=%s)"
+
+                keyword = None
+                sYear = None
+                eYear = None
+                gType = None
+
+                keyword = request.args.get("keyword")
+                sYear = request.args.get("sDate")
+                eYear = request.args.get("eDate")
+                gType = request.args.get("gType")
+
+                cursor.execute(statement, (keyword, sYear, eYear, gType))
                 rows = cursor.fetchall()
 
                 files_id = []

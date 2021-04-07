@@ -85,7 +85,11 @@ export class SearchBar extends Component {
                                 />
                             </Form.Group>
                             <Form.Group as={Col}>
-                                <Button type="primary" htmlType="submit">
+                                <Button type="primary"
+                                    style={{ 'padding-right': '1%' }}
+                                    onClick={() => {
+                                        this.props.searchTable()
+                                    }}>
                                     Search
                                 </Button>
                             </Form.Group>

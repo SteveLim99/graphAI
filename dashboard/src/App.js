@@ -35,9 +35,22 @@ class App extends Component {
 
   getDBFiles = async () => {
     var db_files = []
+    var endpoint = "/db/dbConnect?"
+    const { search_keyword, search_gType, search_sDate, search_eDate } = this.state
+    if (search_keyword !== null) {
+      endpoint += "keyword=" + search_keyword + "&";
+    }
+
+    if (search_gType !== null) {
+      endpoint += "gType=" + search_gType + "&";
+    }
+
+    if (search_sDate !== null && search_eDate !== null) {
+      endpoint += "sDate=" + search_sDate + "&eDate=" + search_eDate;
+    }
 
     try {
-      var res = await axios.get("/db/dbConnect");
+      var res = await axios.get(endpoint);
 
       if (res.status === 200) {
         const db_files_id = res.data["files_id"]
@@ -97,14 +110,12 @@ class App extends Component {
   handleSearchKeyword = (e) => {
     e.preventDefault();
     const val = e.target.value;
-    console.log(val)
     this.setState({
       search_keyword: val
     })
   }
 
   handleSearchSelect = (e) => {
-    console.log(e)
     this.setState({
       search_gType: e
     })
@@ -154,6 +165,16 @@ class App extends Component {
     }
   }
 
+  searchTable = async () => {
+    this.setState({
+      files: await this.getDBFiles(),
+      search_keyword: null,
+      search_sDate: null,
+      search_eDate: null,
+      search_gType: null
+    })
+  }
+
   render() {
     return (
       <div>
@@ -201,7 +222,8 @@ class App extends Component {
                 handleRowID={this.handleRowID}
                 handleSearchKeyword={this.handleSearchKeyword}
                 handleSearchSelect={this.handleSearchSelect}
-                handleSearchDates={this.handleSearchDates}>
+                handleSearchDates={this.handleSearchDates}
+                searchTable={this.searchTable}>
               </DBTable>
               :
               null
