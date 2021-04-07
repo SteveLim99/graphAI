@@ -37,15 +37,15 @@ class App extends Component {
     var db_files = []
     var endpoint = "/db/dbConnect?"
     const { search_keyword, search_gType, search_sDate, search_eDate } = this.state
-    if (search_keyword !== null) {
+    if (search_keyword !== null && search_keyword !== '') {
       endpoint += "keyword=" + search_keyword + "&";
     }
 
-    if (search_gType !== null) {
+    if (search_gType !== null && search_gType !== '') {
       endpoint += "gType=" + search_gType + "&";
     }
 
-    if (search_sDate !== null && search_eDate !== null) {
+    if (search_sDate !== null && search_eDate !== null && search_sDate !== '' && search_eDate !== '') {
       endpoint += "sDate=" + search_sDate + "&eDate=" + search_eDate;
     }
 
@@ -175,6 +175,16 @@ class App extends Component {
     })
   }
 
+  resetTable = async () => {
+    this.setState({
+      search_keyword: null,
+      search_sDate: null,
+      search_eDate: null,
+      search_gType: null,
+      files: await this.getDBFiles()
+    })
+  }
+
   render() {
     return (
       <div>
@@ -223,7 +233,8 @@ class App extends Component {
                 handleSearchKeyword={this.handleSearchKeyword}
                 handleSearchSelect={this.handleSearchSelect}
                 handleSearchDates={this.handleSearchDates}
-                searchTable={this.searchTable}>
+                searchTable={this.searchTable}
+                resetTable={this.resetTable}>
               </DBTable>
               :
               null

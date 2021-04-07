@@ -84,7 +84,8 @@ export class DBTable extends Component {
                     handleSearchKeyword={this.props.handleSearchKeyword}
                     handleSearchSelect={this.props.handleSearchSelect}
                     handleSearchDates={this.props.handleSearchDates}
-                    searchTable={this.props.searchTable}>
+                    searchTable={this.props.searchTable}
+                    resetTable={this.props.resetTable}>
                 </SearchBar>
                 <Table
                     columns={columns}

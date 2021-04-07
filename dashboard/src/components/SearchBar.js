@@ -5,6 +5,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import CloseIcon from '@material-ui/icons/Close';
 import styled from "styled-components";
 import IconButton from '@material-ui/core/IconButton';
+import SettingsBackupRestoreSharpIcon from '@material-ui/icons/SettingsBackupRestoreSharp';
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
@@ -57,6 +58,13 @@ export class SearchBar extends Component {
                             <SearchIcon fontSize='default' color='primary' />
                         }
                     </IconButton>
+                    <IconButton
+                        className="collapse-icon"
+                        onClick={this.props.resetTable}
+                        color="inherit"
+                    >
+                        <SettingsBackupRestoreSharpIcon fontSize='default' color='primary' />
+                    </IconButton>
                 </div>
 
                 {this.state.expand ?
@@ -86,7 +94,6 @@ export class SearchBar extends Component {
                             </Form.Group>
                             <Form.Group as={Col}>
                                 <Button type="primary"
-                                    style={{ 'padding-right': '1%' }}
                                     onClick={() => {
                                         this.props.searchTable()
                                     }}>
