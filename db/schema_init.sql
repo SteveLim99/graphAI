@@ -17,17 +17,17 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: getall(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: getall(integer, text, date, date, integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.getall() RETURNS TABLE(id integer, name character varying, input_date timestamp without time zone, gtype character varying, context text, arr text, ent text, nx text, probs numeric[])
+CREATE FUNCTION public.getall(result_offset integer DEFAULT 0, keyword text DEFAULT NULL::text, start_year date DEFAULT NULL::date, end_year date DEFAULT NULL::date, graph_type integer DEFAULT NULL::integer) RETURNS TABLE(id integer, name character varying, input_date timestamp without time zone, gtype character varying, context text, arr text, ent text, nx text, probs numeric[])
     LANGUAGE plpgsql
     AS $$
 	begin 
 		return query 
 			select files.id, files.name, files.input_date, g.gtype, g.context, im.arr, im.ent, im.nx, p.probs from files
 			left join(
-				select prediction.id, gt.gtype, gt.context from prediction
+				select prediction.id, gt.gid, gt.gtype, gt.context from prediction
 				left join(
 					select graph_types.gid, graph_types.gtype, graph_types.context from graph_types
 				) as gt
@@ -47,11 +47,19 @@ CREATE FUNCTION public.getall() RETURNS TABLE(id integer, name character varying
 				group by(pb.id)
 			) as p
 			on files.id = p.id
+			where 
+			(keyword ISNULL OR files.name ilike concat(keyword,'%'))
+			and 
+			(start_year ISNULL or files.input_date::date >= start_year)
+			and
+			(end_year ISNULL or files.input_date::date <= end_year)
+			and
+			(graph_type ISNULL or g.gid = graph_type)
 			group by files.id, g.gtype, g.context, im.arr, im.ent, im.nx, p.probs;
 end;$$;
 
 
-ALTER FUNCTION public.getall() OWNER TO postgres;
+ALTER FUNCTION public.getall(result_offset integer, keyword text, start_year date, end_year date, graph_type integer) OWNER TO postgres;
 
 SET default_tablespace = '';
 
