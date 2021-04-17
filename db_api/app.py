@@ -14,14 +14,16 @@ app = Flask(__name__)
 
 UPLOAD_FOLDER = os.getcwd() + "/data/uploads/"
 DOWNLOAD_FOLDER = os.getcwd() + "/data/predictions/"
+DB_MAX_RETRIES = 5
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['DOWNLOAD_FOLDER'] = DOWNLOAD_FOLDER
+app.config['DB_MAX_RETRIES'] = DB_MAX_RETRIES
 
 
 @app.route('/dbConnect',  methods=['GET', 'POST'])
 def connectToDB():
     retries = 0
-    max_retry = 5
+    max_retry = app.config['DB_MAX_RETRIES']
     conn = None
     res = {}
 
@@ -172,7 +174,7 @@ def downloadFileFromDB():
     file_type = request.args.get("file")
 
     retries = 0
-    max_retry = 5
+    max_retry = app.config['DB_MAX_RETRIES']
     conn = None
     res = {}
 
@@ -217,6 +219,47 @@ def downloadFileFromDB():
     if conn:
         conn.close()
     return res
+
+
+@app.route('/dbDeleteFile', methods=['POST'])
+def deleteFileFromDB():
+    graph_id = request.args.get('id')
+
+    retries = 0
+    max_retry = app.config['DB_MAX_RETRIES']
+    conn = None
+    deleted = False
+
+    while retries != max_retry:
+        try:
+            print("Values currently being processed")
+            input_id_int = int(graph_id)
+
+            conn = psycopg2.connect(
+                host=host,
+                database=database,
+                user=user,
+                password=password
+            )
+            cursor = conn.cursor()
+
+            statement = "SELECT * FROM delete_prediction(%s)"
+            cursor.execute(statement, (input_id_int,))
+            conn.commit()
+            deleted = True
+            break
+        except(Exception, psycopg2.DatabaseError, ValueError) as error:
+            print(error)
+            if type(error).__name__ == "ValueError":
+                print("Value Provided is not of type Integer")
+                break
+            if conn:
+                conn.rollback()
+                print("Retry Attempt: " + str(retries) +
+                      " / " + str(max_retry))
+    if conn:
+        conn.close()
+    return {'file_deteleted': str(deleted)}
 
 
 def encode_img(image_path):

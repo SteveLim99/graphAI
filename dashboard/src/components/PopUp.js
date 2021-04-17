@@ -78,7 +78,7 @@ export class PopUp extends Component {
                                         size="small"
                                         startIcon={<SaveIcon />}
                                         style={{ float: "right" }}
-                                        onClick={(e) => { this.handleSaveFromDB(e, this.props.rowID, 2) }}
+                                        onClick={(e) => { this.handleSaveFromDB(e, this.props.rowID, 1) }}
                                     >
                                         Save
                                     </Button>

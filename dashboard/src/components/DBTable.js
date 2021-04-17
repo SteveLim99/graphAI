@@ -2,8 +2,11 @@ import React, { Component } from "react";
 import { Table } from 'antd';
 import "antd/dist/antd.css";
 import styled from "styled-components";
+import axios from "axios";
 import Button from '@material-ui/core/Button';
 import { SearchBar } from './SearchBar';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteForeverRoundedIcon from '@material-ui/icons/DeleteForeverRounded';
 
 const Styles = styled.div`
 
@@ -22,6 +25,28 @@ export class DBTable extends Component {
         this.props.handlePredictionChanges(pred, probs[0], probs[1], context)
         this.props.handleRowID(id);
         this.props.toggle();
+    }
+
+    handleDeleteFileButton = async (e, id) => {
+        e.preventDefault();
+        try {
+            var res = await axios.post(
+                "db/dbDeleteFile?id=" + id,
+                {}
+            )
+
+            if (res.status === 200) {
+                const deletedFile = Boolean(res.data["file_deteleted"])
+
+                if (deletedFile === true) {
+                    this.props.resetTable();
+                }
+
+            }
+        } catch (error) {
+            console.log(error)
+            alert("File delete error, check console for error message")
+        }
     }
 
     render() {
@@ -75,7 +100,23 @@ export class DBTable extends Component {
                     >
                         Load Modal
                     </Button>
+
                 ),
+            },
+            {
+                title: "Delete Prediction",
+                key: 'action',
+                render: (record) => (
+                    <IconButton
+                        className="collapse-icon"
+                        color="inherit"
+                        onClick={(e) => {
+                            this.handleDeleteFileButton(e, record.files_id)
+                        }}
+                    >
+                        <DeleteForeverRoundedIcon fontSize='default' color='error' />
+                    </IconButton>
+                )
             }
         ];
         return (
