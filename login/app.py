@@ -4,6 +4,7 @@ from flask.views import MethodView
 from login import encode, decode
 from flask_bcrypt import Bcrypt
 from dotenv import dotenv_values
+from datetime import datetime
 import psycopg2
 
 app = Flask(__name__)
@@ -18,6 +19,7 @@ def register_user():
     email = request.args.get("email")
     pw = request.args.get("pw")
     conn = None
+    res = None
     try:
         conn = psycopg2.connect(
             host="postgres",
@@ -26,16 +28,37 @@ def register_user():
             password="postgres"
         )
         cursor = conn.cursor()
-        statement = "SELECT EXISTS(SELECT uid FROM users WHERE uname = %s)"
-        cursor.execute(statement, (uName,))
-        does_user_exist = cursor.fetchone()[0]
-        print(does_user_exist)
-        return str(does_user_exist)
+        statement = "select exists(select 1 from users where uname=%s or email=%s limit 1)"
+        cursor.execute(statement, (uName, email,))
+        does_user_exist = bool(cursor.fetchone()[0])
+
+        if not does_user_exist:
+            pw_hash = bcrypt.generate_password_hash(pw)
+            dt = datetime.today().strftime('%Y-%m-%d  %H:%M:%S')
+            statement = "insert into users(uname, email, pw, register_date) values(%s, %s, %s, TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS')) RETURNING uid"
+            cursor.execute(statement, (uName, email, pw_hash, dt,))
+            uid = cursor.fetchone()[0]
+            conn.commit()
+            token = encode(uid)
+            res = {
+                'status': 'success',
+                'message': 'Successfully registered.'
+            }
+
+        else:
+            res = {
+                'status': 'fail',
+                'message': 'user name or email taken.'
+            }
     except (Exception, psycopg2.DatabaseError) as error:
         print("error" + str(error))
         if conn:
             conn.rollback()
-        return "error"
+        res = {
+            'status': 'fail',
+            'message': 'Some error occurred. Please try again.'
+        }
     finally:
         if conn:
             conn.close()
+        return res
