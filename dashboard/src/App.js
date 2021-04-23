@@ -38,7 +38,7 @@ class App extends Component {
   getDBFiles = async () => {
     var db_files = []
     var endpoint = "/db/dbConnect?"
-    const { search_keyword, search_gType, search_sDate, search_eDate } = this.state
+    const { search_keyword, search_gType, search_sDate, search_eDate, user_token } = this.state
     if (search_keyword !== null && search_keyword !== '') {
       endpoint += "keyword=" + search_keyword + "&";
     }
@@ -48,36 +48,48 @@ class App extends Component {
     }
 
     if (search_sDate !== null && search_eDate !== null && search_sDate !== '' && search_eDate !== '') {
-      endpoint += "sDate=" + search_sDate + "&eDate=" + search_eDate;
+      endpoint += "sDate=" + search_sDate + "&eDate=" + search_eDate + "&";
     }
+
+    endpoint += "token=" + user_token;
 
     try {
       var res = await axios.get(endpoint);
 
       if (res.status === 200) {
-        const db_files_id = res.data["files_id"]
-        const db_files_name = res.data["files_name"]
-        const db_files_date = res.data["files_date"]
-        const db_files_arr = res.data["files_arr"]
-        const db_files_ent = res.data["files_ent"]
-        const db_files_nx = res.data["files_nx"]
-        const db_files_gtype = res.data["files_gtype"]
-        const db_files_probs = res.data["files_probs"]
-        const db_files_context = res.data["files_context"]
+        const status = res.data["status"]
+        const msg = res.data["message"]
 
-        for (var i = 0; i < db_files_id.length; i++) {
-          var file = {
-            "files_id": db_files_id[i],
-            "files_name": db_files_name[i],
-            "files_date": db_files_date[i],
-            "files_arr": db_files_arr[i],
-            "files_ent": db_files_ent[i],
-            "files_nx": db_files_nx[i],
-            "files_context": db_files_context[i],
-            "files_gtype": db_files_gtype[i],
-            "files_probs": db_files_probs[i]
+        if (status === "success") {
+          const db_files_id = res.data["files_id"]
+          const db_files_name = res.data["files_name"]
+          const db_files_date = res.data["files_date"]
+          const db_files_arr = res.data["files_arr"]
+          const db_files_ent = res.data["files_ent"]
+          const db_files_nx = res.data["files_nx"]
+          const db_files_gtype = res.data["files_gtype"]
+          const db_files_probs = res.data["files_probs"]
+          const db_files_context = res.data["files_context"]
+
+          for (var i = 0; i < db_files_id.length; i++) {
+            var file = {
+              "files_id": db_files_id[i],
+              "files_name": db_files_name[i],
+              "files_date": db_files_date[i],
+              "files_arr": db_files_arr[i],
+              "files_ent": db_files_ent[i],
+              "files_nx": db_files_nx[i],
+              "files_context": db_files_context[i],
+              "files_gtype": db_files_gtype[i],
+              "files_probs": db_files_probs[i]
+            }
+            db_files.push(file)
           }
-          db_files.push(file)
+        }
+
+        else {
+          alert(msg)
+          this.handleUserToken(null)
         }
 
       }
@@ -222,7 +234,9 @@ class App extends Component {
                 handleImgChanges={this.handleImgChanges}
                 handlePredictionChanges={this.handlePredictionChanges}
                 updateTable={this.updateTable}
-                handleRowID={this.handleRowID}>
+                handleRowID={this.handleRowID}
+                handleUserToken={this.handleUserToken}
+                user_token={this.state.user_token}>
               </FileUpload>
               <IconButton
                 onClick={this.updateTable}

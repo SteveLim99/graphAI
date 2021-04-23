@@ -1,7 +1,7 @@
 from flask import Blueprint, request, make_response, jsonify
 from flask import Flask, flash, redirect, url_for, send_file
 from flask.views import MethodView
-from login import encode, decode, check_if_exist, verify_token
+from lib.utils.login import encode, decode, check_if_exist, verify_token
 from flask_bcrypt import Bcrypt
 from dotenv import dotenv_values
 from datetime import datetime

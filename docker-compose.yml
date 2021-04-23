@@ -24,18 +24,20 @@ services:
       - postgres
     logging:
       driver: "none"
-  # db_api:
-  #   container_name: db_api
-  #   build: ./db_api
-  #   ports:
-  #     - "127.0.0.1:5002:5002"
-  #   volumes:
-  #     - ./db_api:/code
-  #     - ./data:/code/data
-  #   environment:
-  #     FLASK_ENV: development
-  #   depends_on:
-  #     - postgres
+  db_api:
+    container_name: db_api
+    build: ./db_api
+    ports:
+      - "127.0.0.1:5002:5002"
+    volumes:
+      - ./db_api:/code
+      - ./data:/code/data
+      - ./env:/code/env
+      - ./lib:/code/lib
+    environment:
+      FLASK_ENV: development
+    depends_on:
+      - postgres
   # api:
   #   container_name: api
   #   build: ./api
@@ -56,6 +58,7 @@ services:
     volumes:
       - ./login:/code
       - ./env:/code/env
+      - ./lib:/code/lib
     environment:
       FLASK_ENV: development
     depends_on:
