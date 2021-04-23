@@ -30,16 +30,22 @@ export class DBTable extends Component {
     handleDeleteFileButton = async (e, id) => {
         e.preventDefault();
         try {
+            var endpoint = "db/dbDeleteFile?id=" + id
+            endpoint += "&token=" + this.props.user_token
             var res = await axios.post(
-                "db/dbDeleteFile?id=" + id,
+                endpoint,
                 {}
             )
 
             if (res.status === 200) {
-                const deletedFile = Boolean(res.data["file_deteleted"])
+                const deletedFile = res.data["status"]
+                const deletedFileMsg = res.data["message"]
 
-                if (deletedFile === true) {
+                if (deletedFile === "success") {
                     this.props.resetTable();
+                } else {
+                    alert(deletedFileMsg);
+                    this.props.handleUserToken(null);
                 }
 
             }

@@ -35,10 +35,10 @@ end;$$;
 ALTER FUNCTION public.delete_prediction(input_id integer) OWNER TO postgres;
 
 --
--- Name: getall(integer, text, date, date, integer); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: getall(integer, text, date, date, integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.getall(result_offset integer DEFAULT 0, keyword text DEFAULT NULL::text, start_year date DEFAULT NULL::date, end_year date DEFAULT NULL::date, graph_type integer DEFAULT NULL::integer) RETURNS TABLE(id integer, name character varying, input_date timestamp without time zone, gtype character varying, context text, arr text, ent text, nx text, probs numeric[])
+CREATE FUNCTION public.getall(result_offset integer DEFAULT 0, keyword text DEFAULT NULL::text, start_year date DEFAULT NULL::date, end_year date DEFAULT NULL::date, graph_type integer DEFAULT NULL::integer, input_uid integer DEFAULT NULL::integer) RETURNS TABLE(id integer, name character varying, input_date timestamp without time zone, gtype character varying, context text, arr text, ent text, nx text, probs numeric[])
     LANGUAGE plpgsql
     AS $$
 	begin 
@@ -73,11 +73,13 @@ CREATE FUNCTION public.getall(result_offset integer DEFAULT 0, keyword text DEFA
 			(end_year ISNULL or files.input_date::date <= end_year)
 			and
 			(graph_type ISNULL or g.gid = graph_type)
+			and
+			(files.uid = input_uid)
 			group by files.id, g.gtype, g.context, im.arr, im.ent, im.nx, p.probs;
 end;$$;
 
 
-ALTER FUNCTION public.getall(result_offset integer, keyword text, start_year date, end_year date, graph_type integer) OWNER TO postgres;
+ALTER FUNCTION public.getall(result_offset integer, keyword text, start_year date, end_year date, graph_type integer, input_uid integer) OWNER TO postgres;
 
 SET default_tablespace = '';
 
@@ -98,13 +100,42 @@ CREATE TABLE public.downloads (
 ALTER TABLE public.downloads OWNER TO postgres;
 
 --
+-- Name: expired_tokens; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.expired_tokens (
+    tid integer NOT NULL,
+    uid integer NOT NULL,
+    token text NOT NULL,
+    expiry_date timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.expired_tokens OWNER TO postgres;
+
+--
+-- Name: expired_tokens_tid_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.expired_tokens ALTER COLUMN tid ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.expired_tokens_tid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: files; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.files (
     id integer NOT NULL,
     name character varying(255) NOT NULL,
-    input_date timestamp without time zone
+    input_date timestamp without time zone,
+    uid integer NOT NULL
 );
 
 
@@ -206,11 +237,56 @@ ALTER TABLE public.probability ALTER COLUMN idx ADD GENERATED ALWAYS AS IDENTITY
 
 
 --
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    uid integer NOT NULL,
+    uname character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    pw text NOT NULL,
+    register_date timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- Name: users_uid_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.users ALTER COLUMN uid ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.users_uid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: downloads downloads_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.downloads
     ADD CONSTRAINT downloads_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: expired_tokens expired_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.expired_tokens
+    ADD CONSTRAINT expired_tokens_pkey PRIMARY KEY (tid);
+
+
+--
+-- Name: expired_tokens expired_tokens_token_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.expired_tokens
+    ADD CONSTRAINT expired_tokens_token_key UNIQUE (token);
 
 
 --
@@ -254,11 +330,27 @@ ALTER TABLE ONLY public.probability
 
 
 --
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (uid);
+
+
+--
 -- Name: downloads downloads_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.downloads
     ADD CONSTRAINT downloads_id_fkey FOREIGN KEY (id) REFERENCES public.files(id);
+
+
+--
+-- Name: expired_tokens expired_tokens_uid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.expired_tokens
+    ADD CONSTRAINT expired_tokens_uid_fkey FOREIGN KEY (uid) REFERENCES public.users(uid);
 
 
 --
@@ -299,6 +391,14 @@ ALTER TABLE ONLY public.probability
 
 ALTER TABLE ONLY public.probability
     ADD CONSTRAINT probability_id_fkey FOREIGN KEY (id) REFERENCES public.files(id);
+
+
+--
+-- Name: files uid; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.files
+    ADD CONSTRAINT uid FOREIGN KEY (uid) REFERENCES public.users(uid);
 
 
 --

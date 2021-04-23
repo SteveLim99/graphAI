@@ -19,25 +19,32 @@ export class PopUp extends Component {
         e.preventDefault();
         var endpoint = '/db/dbGetFile?id=' + String(id);
         endpoint += '&file=' + String(file);
+        endpoint += "&token=" + this.props.user_token
         axios({
             url: endpoint,
             method: 'GET',
             responseType: 'blob'
         }).then((response) => {
-            let fileName = "undefined";
-            if (file === 1) {
-                fileName = String(id) + "_entity.png";
-            } else if (file === 0) {
-                fileName = String(id) + "_arrow.png";
-            } else if (file === 2) {
-                fileName = String(id) + "_networkx_obj.gml"
+            if (response && response.data["status"]) {
+                const msg = response.data["message"]
+                alert(msg)
+                this.props.handleUserToken(null)
+            } else {
+                let fileName = "undefined";
+                if (file === 1) {
+                    fileName = String(id) + "_entity.png";
+                } else if (file === 0) {
+                    fileName = String(id) + "_arrow.png";
+                } else if (file === 2) {
+                    fileName = String(id) + "_networkx_obj.gml"
+                }
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', fileName);
+                document.body.appendChild(link);
+                link.click();
             }
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', fileName);
-            document.body.appendChild(link);
-            link.click();
         });
     }
 

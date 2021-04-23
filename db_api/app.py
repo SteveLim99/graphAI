@@ -223,22 +223,39 @@ def downloadFileFromDB():
                     password=database_config["POSTGRES_PASSWORD"]
                 )
                 cursor = conn.cursor()
+                token = request.args.get("token")
+                token_verification = verify_token(
+                    token, cursor, jwt_config["SECRET_KEY"])
+                token_status = token_verification["status"]
+                token_msg = token_verification["message"]
+                token_uid = token_verification["uid"]
 
-                statement = "SELECT %s FROM downloads where id = %s"
-                cursor.execute(statement, (AsIs(file), graph_id,))
-                bdata = cursor.fetchone()[0]
+                if token_status:
+                    statement = "SELECT %s FROM downloads where id = %s"
+                    cursor.execute(statement, (AsIs(file), graph_id,))
+                    bdata = cursor.fetchone()[0]
 
-                return send_file(
-                    io.BytesIO(bdata),
-                    as_attachment=True,
-                    attachment_filename=filename
-                )
+                    return send_file(
+                        io.BytesIO(bdata),
+                        as_attachment=True,
+                        attachment_filename=filename
+                    )
+
+                else:
+                    res = {
+                        'status': 'fail',
+                        'message': token_msg
+                    }
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
             retries += 1
             if conn:
                 conn.rollback()
             print("Retry Attempt: " + str(retries) + " / " + str(max_retry))
+            res = {
+                'status': 'fail',
+                'message': error
+            }
     if conn:
         conn.close()
     return res
@@ -252,6 +269,7 @@ def deleteFileFromDB():
     max_retry = app.config['DB_MAX_RETRIES']
     conn = None
     deleted = False
+    res = None
 
     while retries != max_retry:
         try:
@@ -265,11 +283,28 @@ def deleteFileFromDB():
                 password=database_config["POSTGRES_PASSWORD"]
             )
             cursor = conn.cursor()
+            token = request.args.get("token")
+            token_verification = verify_token(
+                token, cursor, jwt_config["SECRET_KEY"])
+            token_status = token_verification["status"]
+            token_msg = token_verification["message"]
+            token_uid = token_verification["uid"]
 
-            statement = "SELECT * FROM delete_prediction(%s)"
-            cursor.execute(statement, (input_id_int,))
-            conn.commit()
-            deleted = True
+            if token_status:
+                statement = "SELECT * FROM delete_prediction(%s)"
+                cursor.execute(statement, (input_id_int,))
+                conn.commit()
+                deleted = True
+                res = {
+                    'status': 'success',
+                    'message': 'File Deleted'
+                }
+
+            else:
+                res = {
+                    'status': 'fail',
+                    'message': token_msg
+                }
             break
         except(Exception, psycopg2.DatabaseError, ValueError) as error:
             print(error)
@@ -280,9 +315,13 @@ def deleteFileFromDB():
                 conn.rollback()
                 print("Retry Attempt: " + str(retries) +
                       " / " + str(max_retry))
+            res = {
+                'status': 'fail',
+                'message': error
+            }
     if conn:
         conn.close()
-    return {'file_deteleted': str(deleted)}
+    return res
 
 
 def encode_img(image_path):

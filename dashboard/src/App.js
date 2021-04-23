@@ -258,7 +258,9 @@ class App extends Component {
                 prob_0={this.state.prob_0}
                 prob_1={this.state.prob_1}
                 content={this.state.content}
-                rowID={this.state.rowID}>
+                rowID={this.state.rowID}
+                handleUserToken={this.handleUserToken}
+                user_token={this.state.user_token}>
               </PopUp>
               {this.state.viewPast ?
                 <DBTable
@@ -273,7 +275,9 @@ class App extends Component {
                   handleSearchSelect={this.handleSearchSelect}
                   handleSearchDates={this.handleSearchDates}
                   searchTable={this.searchTable}
-                  resetTable={this.resetTable}>
+                  resetTable={this.resetTable}
+                  handleUserToken={this.handleUserToken}
+                  user_token={this.state.user_token}>
                 </DBTable>
                 :
                 null
