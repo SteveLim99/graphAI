@@ -44,11 +44,12 @@ $ docker service ls
 6. The output should ressemble the following:
 ```
 ID             NAME                           MODE         REPLICAS   IMAGE                                 PORTS
-container_id   graphai_webapp_api             replicated   1/1        127.0.0.1:5000/api:latest             *:5000->5000/tcp
-container_id   graphai_webapp_db_api          replicated   2/2        127.0.0.1:5002/db_api:latest          *:5002->5002/tcp
-container_id   graphai_webapp_frontend_prod   replicated   1/1        127.0.0.1:3000/frontend_prod:latest   *:3000->80/tcp
-container_id   graphai_webapp_gnn_api         replicated   1/1        127.0.0.1:5001/gnn_api:latest         *:5001->5001/tcp
-container_id   graphai_webapp_postgres        replicated   1/1        postgres:alpine                       *:5432->5432/tcp
+y2ghlv164z26   graphai_webapp_api             replicated   1/1        127.0.0.1:5000/api:latest             *:5000->5000/tcp
+xyxal0u2478d   graphai_webapp_db_api          replicated   1/1        127.0.0.1:5002/db_api:latest          *:5002->5002/tcp
+v4gujlsiop0r   graphai_webapp_frontend_prod   replicated   1/1        127.0.0.1:3000/frontend_prod:latest   *:3000->80/tcp
+3c88c2jm5rnp   graphai_webapp_gnn_api         replicated   1/1        127.0.0.1:5001/gnn_api:latest         *:5001->5001/tcp
+cqbsc7pkn7en   graphai_webapp_login           replicated   1/1        127.0.0.1:5003/login:latest           *:5003->5003/tcp
+rv57qu93h6ho   graphai_webapp_postgres        replicated   1/1        postgres:alpine                       *:5432->5432/tcp
 ```
 - The container_id should ressemble a hash
 7. Removing the swarm service
