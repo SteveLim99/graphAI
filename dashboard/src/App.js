@@ -196,8 +196,16 @@ class App extends Component {
   render() {
     if (this.state.user_token == null) {
       return (
-        <SignIn
-          handleUserToken={this.handleUserToken} />
+        <div className="App">
+          <header className="App-header" style={{ backgroundImage: `url(${background})` }}>
+            <NavBar
+              user_token={this.state.user_token}
+              handleUserToken={this.handleUserToken}>
+            </NavBar>
+            <SignIn
+              handleUserToken={this.handleUserToken} />
+          </header>
+        </div>
       );
     } else {
       return (

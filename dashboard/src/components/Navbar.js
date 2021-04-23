@@ -36,13 +36,16 @@ export class NavBar extends Component {
                 <Navbar className="navbar" >
                     <Navbar.Brand className="navbar-text">Graph AI</Navbar.Brand>
                     <Navbar.Collapse className="justify-content-end">
-                        <IconButton
-                            className="collapse-icon"
-                            color="inherit"
-                            onClick={(e) => { this.handleLogOut(e) }}
-                        >
-                            <MeetingRoomIcon fontSize='default' color='secondary' />
-                        </IconButton>
+                        {this.props.user_token === null ?
+                            null
+                            :
+                            <IconButton
+                                className="collapse-icon"
+                                color="inherit"
+                                onClick={(e) => { this.handleLogOut(e) }}
+                            >
+                                <MeetingRoomIcon fontSize='default' color='secondary' />
+                            </IconButton>}
                     </Navbar.Collapse>
                 </Navbar>
             </Styles>

@@ -30,6 +30,13 @@ const useStyles = makeStyles((theme) => ({
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
+    font: {
+        color: "#FFFFFF"
+    },
+    text_fields: {
+        background: "rgba(255, 255, 255, 0.3)",
+        borderRadius: "5px"
+    }
 }));
 
 export var SignIn = (props) => {
@@ -103,8 +110,8 @@ export var SignIn = (props) => {
                 <Avatar className={classes.avatar}>
                     {register ? <ListAltSharpIcon /> : <LockOutlinedIcon />}
                 </Avatar>
-                <Typography component="h1" variant="h5">
-                    {register ? "Sign Up Now!" : "Sign in"}
+                <Typography component="h1" variant="h5" className={classes.font}>
+                    {register ? "Sign Up" : "Sign in"}
                 </Typography>
                 <form className={classes.form} noValidate>
                     <TextField
@@ -117,6 +124,7 @@ export var SignIn = (props) => {
                         label="Username"
                         name="uname"
                         autoComplete="uname"
+                        className={classes.text_fields}
                         autoFocus
                         onChange={(e) => setUname(e.target.value)}
                     />
@@ -133,6 +141,7 @@ export var SignIn = (props) => {
                             label="Email Address"
                             name="email"
                             autoComplete="email"
+                            className={classes.text_fields}
                             autoFocus
                             onChange={(e) => setEmail(e.target.value)}
                         />
@@ -147,6 +156,7 @@ export var SignIn = (props) => {
                         fullWidth
                         label="Password"
                         type="password"
+                        className={classes.text_fields}
                         autoComplete="current-password"
                         onChange={(e) => setPw(e.target.value)}
                     />
