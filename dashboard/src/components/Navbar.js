@@ -3,6 +3,7 @@ import { Navbar } from 'react-bootstrap';
 import styled from "styled-components";
 import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 import IconButton from '@material-ui/core/IconButton';
+import axios from "axios";
 
 const Styles = styled.div`
     .navbar{
@@ -18,8 +19,15 @@ const Styles = styled.div`
 `
 
 export class NavBar extends Component {
-    handleLogOut = async () => {
-        
+    handleLogOut = async (e) => {
+        e.preventDefault();
+        const endpoint = "/user/logout?token=" + this.props.user_token
+
+        try {
+            await axios.post(endpoint, {})
+        } finally {
+            this.props.handleUserToken(null);
+        }
     }
 
     render() {
@@ -31,6 +39,7 @@ export class NavBar extends Component {
                         <IconButton
                             className="collapse-icon"
                             color="inherit"
+                            onClick={(e) => { this.handleLogOut(e) }}
                         >
                             <MeetingRoomIcon fontSize='default' color='secondary' />
                         </IconButton>

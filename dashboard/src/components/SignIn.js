@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react';
+import React, { useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -51,7 +51,6 @@ export var SignIn = (props) => {
             if (res.status === 200) {
                 const status = res.data["status"];
                 const token = res.data["auth_token"];
-                console.log(token)
                 if (status === "success") {
                     props.handleUserToken(token)
                 } else {

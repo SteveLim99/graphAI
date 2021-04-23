@@ -196,14 +196,18 @@ class App extends Component {
   render() {
     if (this.state.user_token == null) {
       return (
-        <SignIn handleUserToken={this.handleUserToken} />
+        <SignIn
+          handleUserToken={this.handleUserToken} />
       );
     } else {
       return (
         <div>
           <div className="App">
             <header className="App-header" style={{ backgroundImage: `url(${background})` }}>
-              <NavBar></NavBar>
+              <NavBar
+                user_token={this.state.user_token}
+                handleUserToken={this.handleUserToken}>
+              </NavBar>
               <FileUpload
                 toggle={this.toggleOpen}
                 open={this.state.open}
