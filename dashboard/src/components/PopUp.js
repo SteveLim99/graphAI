@@ -29,6 +29,7 @@ export class PopUp extends Component {
                 const msg = response.data["message"]
                 alert(msg)
                 this.props.handleUserToken(null)
+                this.props.logOutReset();
             } else {
                 let fileName = "undefined";
                 if (file === 1) {

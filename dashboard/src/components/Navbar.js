@@ -27,6 +27,7 @@ export class NavBar extends Component {
             await axios.post(endpoint, {})
         } finally {
             this.props.handleUserToken(null);
+            this.props.logOutReset();
         }
     }
 

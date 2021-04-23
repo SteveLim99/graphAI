@@ -79,74 +79,106 @@ export class FileUpload extends Component {
         {}
       );
       if (res.status === 200) {
-        const arr = res.data["arrow_img"];
-        const ent = res.data["entity_img"];
-        const nx = res.data["networkx_img"];
-        this.props.handleImgChanges(arr, ent, nx)
+        const status = res.data["status"];
+
+        if (status === "success") {
+          const arr = res.data["arrow_img"];
+          const ent = res.data["entity_img"];
+          const nx = res.data["networkx_img"];
+          this.props.handleImgChanges(arr, ent, nx)
+
+          this.setState({
+            title: "Running GNN Model..."
+          })
+
+          var pred = ""
+          var p0 = ""
+          var p1 = ""
+
+          var gnn_res = await axios.post(
+            "/gnn/gmlUpload?" + token,
+            {}
+          );
+
+          if (gnn_res.status === 200) {
+            const gnn_status = gnn_res.data["status"];
+
+            if (gnn_status === "success") {
+              pred = gnn_res.data["prediction"];
+              p0 = gnn_res.data["prob_0"];
+              p1 = gnn_res.data["probs_1"];
+              const content = gnn_res.data["content"];
+
+              this.props.handlePredictionChanges(pred, p0, p1, content)
+
+              const pred_endpoint = "?pred=" + pred;
+              const bpnm_prob_endpoint = "&BPNM=" + p0;
+              const swimlane_prob_endpoint = "&Swimlane=" + p1;
+
+              const endpoint = "/db/dbConnect" + pred_endpoint + bpnm_prob_endpoint + swimlane_prob_endpoint + "&" + token;
+              var db_res = await axios.post(
+                endpoint,
+                {}
+              )
+
+              if (db_res.status === 200) {
+                const db_status = db_res.data["status"];
+
+                if (db_status === "success") {
+                  console.log("DB Updated")
+                  const graphID = db_res.data["graphID"]
+                  this.props.handleRowID(graphID)
+                  this.props.updateTable();
+                  this.props.toggle();
+                } else {
+                  const db_message = db_res.data["message"];
+                  if (db_message.startsWith("Token Error")) {
+                    alert(db_message)
+                    this.props.handleUserToken(null)
+                    this.props.logOutReset();
+                  } else {
+                    alert("DB Error: " + db_message)
+                  }
+                }
+
+              }
+            } else {
+              const gnn__message = gnn_res.data["message"];
+              if (gnn__message.startsWith("Token Error")) {
+                alert(gnn__message)
+                this.props.handleUserToken(null)
+                this.props.logOutReset();
+              } else {
+                alert("GNN Error: " + gnn__message)
+              }
+            }
+          }
+
+        } else {
+          const message = res.data["message"];
+          if (message.startsWith("Token Error")) {
+            alert(message)
+            this.props.handleUserToken(null)
+            this.props.logOutReset();
+          } else {
+            alert("RCNN Error: " + message)
+          }
+        }
       }
     } catch (error) {
-      alert("File submission error, check console for error message");
-      loader.style.display = "none";
-    }
-
-    this.setState({
-      title: "Running GNN Model..."
-    })
-
-    var pred = ""
-    var p0 = ""
-    var p1 = ""
-    try {
-      var gnn_res = await axios.post(
-        "/gnn/gmlUpload?" + token,
-        {}
-      );
-
-      if (gnn_res.status === 200) {
-        pred = gnn_res.data["prediction"];
-        p0 = gnn_res.data["prob_0"];
-        p1 = gnn_res.data["probs_1"];
-        const content = gnn_res.data["content"];
-        this.props.handlePredictionChanges(pred, p0, p1, content)
-      }
-    } catch (error) {
-      alert("File submission error, check console for error message");
-    }
-
-    try {
-      const pred_endpoint = "?pred=" + pred;
-      const bpnm_prob_endpoint = "&BPNM=" + p0;
-      const swimlane_prob_endpoint = "&Swimlane=" + p1;
-
-      const endpoint = "/db/dbConnect" + pred_endpoint + bpnm_prob_endpoint + swimlane_prob_endpoint + "&" + token;
-      var db_res = await axios.post(
-        endpoint,
-        {}
-      )
-
-      if (db_res.status === 200) {
-        console.log("DB Updated")
-        const graphID = db_res.data["graphID"]
-        this.props.handleRowID(graphID)
-      }
-      this.props.updateTable();
-      this.props.toggle();
-    } catch (error) {
+      alert("File submission error: Check console for error message");
       console.log(error)
-      alert("File submission error, check console for error message");
+    } finally {
       loader.style.display = "none";
-    }
-
-    this.setState({
-      fileUploadLabel: "Attach a File",
-      title: "Insert File to Get Started"
-    })
-
-    loader.style.display = "none";
-    loader_upload.style.display = 'block';
-    loader_button.style.display = 'block';
-    if (!this.props.open) {
-      form.reset();
+      loader_upload.style.display = 'block';
+      loader_button.style.display = 'block';
+      this.setState({
+        fileUploadLabel: "Attach a File",
+        title: "Insert File to Get Started"
+      })
+      if (!this.props.open) {
+        form.reset();
+      }
     }
   }
 

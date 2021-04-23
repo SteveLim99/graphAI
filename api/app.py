@@ -8,6 +8,7 @@ import detect_image
 import csv_to_networkx
 from lib.utils.login import verify_token
 from dotenv import dotenv_values
+import psycopg2
 
 jwt_config = dotenv_values("./env/jwt_secret.env")
 database_config = dotenv_values("./env/database.env")

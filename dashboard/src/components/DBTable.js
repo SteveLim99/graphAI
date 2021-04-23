@@ -46,6 +46,7 @@ export class DBTable extends Component {
                 } else {
                     alert(deletedFileMsg);
                     this.props.handleUserToken(null);
+                    this.props.logOutReset();
                 }
 
             }

@@ -7,6 +7,7 @@ import model
 import networkx as nx
 from dotenv import dotenv_values
 from lib.utils.login import verify_token
+import psycopg2
 
 jwt_config = dotenv_values("./env/jwt_secret.env")
 database_config = dotenv_values("./env/database.env")

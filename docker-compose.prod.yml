@@ -22,6 +22,8 @@ services:
     volumes:
       - ./db_api:/code
       - ./data:/code/data
+      - ./env:/code/env
+      - ./lib:/code/lib
     environment:
       FLASK_ENV: production
     depends_on:
@@ -35,6 +37,8 @@ services:
     volumes:
       - ./api:/code
       - ./data:/code/data
+      - ./env:/code/env
+      - ./lib:/code/lib
     environment:
       FLASK_ENV: production
     depends_on:
@@ -48,11 +52,26 @@ services:
     volumes:
       - ./gnn_api:/code
       - ./data:/code/data
+      - ./env:/code/env
+      - ./lib:/code/lib
     environment:
       FLASK_ENV: production
     depends_on:
       - postgres
       - api
+  login:
+    container_name: login
+    build: ./login
+    ports:
+      - "127.0.0.1:5003:5003"
+    volumes:
+      - ./login:/code
+      - ./env:/code/env
+      - ./lib:/code/lib
+    environment:
+      FLASK_ENV: production
+    depends_on:
+      - postgres
   frontend_prod:
     image: 127.0.0.1:3000/frontend_prod
     container_name: frontend_prod

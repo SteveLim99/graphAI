@@ -90,6 +90,7 @@ class App extends Component {
         else {
           alert(msg)
           this.handleUserToken(null)
+          this.logOutReset();
         }
 
       }
@@ -205,6 +206,27 @@ class App extends Component {
     })
   }
 
+  logOutReset = () => {
+    this.setState({
+      open: false,
+      arrow_img: "",
+      entity_img: "",
+      networkx_img: "",
+      prediction: "",
+      prob_0: "",
+      prob_1: "",
+      content: "",
+      files: [],
+      viewPast: false,
+      rowID: "",
+      search_keyword: null,
+      search_sDate: null,
+      search_eDate: null,
+      search_gType: null,
+      user_token: null
+    })
+  }
+
   render() {
     if (this.state.user_token == null) {
       return (
@@ -226,7 +248,9 @@ class App extends Component {
             <header className="App-header" style={{ backgroundImage: `url(${background})` }}>
               <NavBar
                 user_token={this.state.user_token}
-                handleUserToken={this.handleUserToken}>
+                handleUserToken={this.handleUserToken}
+                resetTable={this.resetTable}
+                logOutReset={this.logOutReset}>
               </NavBar>
               <FileUpload
                 toggle={this.toggleOpen}
@@ -236,7 +260,8 @@ class App extends Component {
                 updateTable={this.updateTable}
                 handleRowID={this.handleRowID}
                 handleUserToken={this.handleUserToken}
-                user_token={this.state.user_token}>
+                user_token={this.state.user_token}
+                logOutReset={this.logOutReset}>
               </FileUpload>
               <IconButton
                 onClick={this.updateTable}
@@ -260,7 +285,8 @@ class App extends Component {
                 content={this.state.content}
                 rowID={this.state.rowID}
                 handleUserToken={this.handleUserToken}
-                user_token={this.state.user_token}>
+                user_token={this.state.user_token}
+                logOutReset={this.logOutReset}>
               </PopUp>
               {this.state.viewPast ?
                 <DBTable
@@ -277,7 +303,8 @@ class App extends Component {
                   searchTable={this.searchTable}
                   resetTable={this.resetTable}
                   handleUserToken={this.handleUserToken}
-                  user_token={this.state.user_token}>
+                  user_token={this.state.user_token}
+                  logOutReset={this.logOutReset}>
                 </DBTable>
                 :
                 null
