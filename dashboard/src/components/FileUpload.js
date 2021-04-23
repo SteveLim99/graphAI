@@ -56,6 +56,7 @@ export class FileUpload extends Component {
     const loader = document.getElementById("loading");
     const loader_upload = document.getElementById("loading-items");
     const loader_button = document.getElementById("loading-button");
+    const token = "token=" + this.props.user_token;
 
     loader.style.display = "flex";
     loader_upload.style.display = 'none';
@@ -73,7 +74,7 @@ export class FileUpload extends Component {
 
     try {
       var res = await axios.post(
-        "/ood/fileUpload",
+        "/ood/fileUpload?" + token,
         formData,
         {}
       );
@@ -97,7 +98,7 @@ export class FileUpload extends Component {
     var p1 = ""
     try {
       var gnn_res = await axios.post(
-        "/gnn/gmlUpload",
+        "/gnn/gmlUpload?" + token,
         {}
       );
 
@@ -116,7 +117,8 @@ export class FileUpload extends Component {
       const pred_endpoint = "?pred=" + pred;
       const bpnm_prob_endpoint = "&BPNM=" + p0;
       const swimlane_prob_endpoint = "&Swimlane=" + p1;
-      const endpoint = "/db/dbConnect" + pred_endpoint + bpnm_prob_endpoint + swimlane_prob_endpoint;
+
+      const endpoint = "/db/dbConnect" + pred_endpoint + bpnm_prob_endpoint + swimlane_prob_endpoint + "&" + token;
       var db_res = await axios.post(
         endpoint,
         {}
