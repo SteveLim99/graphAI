@@ -60,6 +60,7 @@ services:
       - postgres
       - api
   login:
+    image: 127.0.0.1:5003/login
     container_name: login
     build: ./login
     ports:
