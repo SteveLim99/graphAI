@@ -38,7 +38,7 @@ def register_user():
             cursor.execute(statement, (uName, email, pw_hash, dt,))
             uid = cursor.fetchone()[0]
             conn.commit()
-            token = encode(uid, jwt_config["SECRET_KEY"])
+            token = encode(cursor, uid, jwt_config["SECRET_KEY"])
             res = {
                 'status': 'success',
                 'message': 'Successfully registered.',
@@ -88,7 +88,7 @@ def login_user():
             is_pw_true = bcrypt.check_password_hash(db_pw, pw)
 
             if is_pw_true:
-                token = encode(uid, jwt_config["SECRET_KEY"])
+                token = encode(cursor, uid, jwt_config["SECRET_KEY"])
                 res = {
                     'status': 'success',
                     'message': 'Logged in',

@@ -22,12 +22,16 @@ def encode(cursor, user_id, SECRET_KEY):
             algorithm='HS256'
         )
 
-        while is_blacklist_token(cursor, potential_token)["status"]:
+        token_status = is_blacklist_token(cursor, potential_token)["status"]
+
+        while token_status:
             potential_token = jwt.encode(
                 payload,
                 SECRET_KEY,
                 algorithm='HS256'
             )
+            token_status = is_blacklist_token(
+                cursor, potential_token)["status"]
 
         return potential_token
     except Exception as e:
@@ -82,7 +86,7 @@ def verify_token(token, cursor, SECRET_KEY):
 
         if blacklist_status:
             res = {
-                'status': blacklist_status,
+                'status': False,
                 'message': blacklist_msg,
                 'uid': None
             }
@@ -133,13 +137,9 @@ def is_blacklist_token(cursor, token):
             'message': msg
         }
     except (Exception, psycopg2.DatabaseError) as error:
-        if conn:
-            conn.rollback()
         res = {
             'status': True,
             'message': "An Error Occured. Please Re-try"
         }
     finally:
-        if conn:
-            conn.close()
         return res
