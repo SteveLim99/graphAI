@@ -46,6 +46,8 @@ services:
   #   volumes:
   #     - ./api:/code
   #     - ./data:/code/data
+  #     - ./env:/code/env
+  #     - ./lib:/code/lib
   #   environment:
   #     FLASK_ENV: production
   #   depends_on:
@@ -71,6 +73,8 @@ services:
   #   volumes:
   #     - ./gnn_api:/code
   #     - ./data:/code/data
+  #     - ./env:/code/env
+  #     - ./lib:/code/lib
   #   environment:
   #     FLASK_ENV: production
   #   depends_on:

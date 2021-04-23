@@ -2,3 +2,6 @@ Flask
 tensorflow==2.4.1
 dgl
 torch
+PyJWT==2.0.1
+python-dotenv==0.17.0
+psycopg2
