@@ -9,6 +9,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import ListAltSharpIcon from '@material-ui/icons/ListAltSharp';
 import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
@@ -35,8 +36,10 @@ export var SignIn = (props) => {
     const classes = useStyles();
     const [uname, setUname] = useState("")
     const [pw, setPw] = useState("")
+    const [email, setEmail] = useState("")
     const [error, setError] = useState(false)
     const [errorMsg, setErrorMsg] = useState("")
+    const [register, setRegister] = useState(false)
 
     const handleSingIn = async function (e) {
         e.preventDefault()
@@ -63,15 +66,45 @@ export var SignIn = (props) => {
         }
     }
 
+    const handleRegister = async function (e) {
+        e.preventDefault();
+        var endpoint = "/user/registerUser?uname="
+        endpoint += uname
+        endpoint += "&email="
+        endpoint += email
+        endpoint += "&pw="
+        endpoint += pw
+
+        try {
+            var res = await axios.post(
+                endpoint,
+                {}
+            );
+
+            if (res.status === 200) {
+                const status = res.data["status"];
+                const token = res.data["auth_token"];
+                if (status === "success") {
+                    props.handleUserToken(token)
+                } else {
+                    setError(true)
+                    setErrorMsg("Sign Up Failed: Username or email already taken.")
+                }
+            }
+        } catch (error) {
+            alert("Error Occured during Sign Up. Please try again later!");
+        }
+    }
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
-                    <LockOutlinedIcon />
+                    {register ? <ListAltSharpIcon /> : <LockOutlinedIcon />}
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Sign in
+                    {register ? "Sign Up Now!" : "Sign in"}
                 </Typography>
                 <form className={classes.form} noValidate>
                     <TextField
@@ -87,6 +120,24 @@ export var SignIn = (props) => {
                         autoFocus
                         onChange={(e) => setUname(e.target.value)}
                     />
+                    {register
+                        ?
+                        <TextField
+                            error={error}
+                            helperText={errorMsg}
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="email"
+                            label="Email Address"
+                            name="email"
+                            autoComplete="email"
+                            autoFocus
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                        :
+                        null}
                     <TextField
                         error={error}
                         helperText={errorMsg}
@@ -105,14 +156,24 @@ export var SignIn = (props) => {
                         variant="contained"
                         color="primary"
                         className={classes.submit}
-                        onClick={(e) => handleSingIn(e)}
+                        onClick={(e) => {
+                            if (register) {
+                                handleRegister(e)
+                            } else {
+                                handleSingIn(e)
+                            }
+                        }}
                     >
-                        Sign In
+                        {register ? "Sign Up" : "Sign In"}
                     </Button>
                     <Grid container>
                         <Grid item>
-                            <Link href="#" variant="body2">
-                                {"Don't have an account? Sign Up"}
+                            <Link onClick={() => {
+                                setRegister(!register)
+                                setError(false)
+                                setErrorMsg("")
+                            }} variant="body2">
+                                {register ? "Already have an account? Log in" : "Don't have an account? Sign Up"}
                             </Link>
                         </Grid>
                     </Grid>

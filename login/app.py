@@ -48,14 +48,16 @@ def register_user():
         else:
             res = {
                 'status': 'fail',
-                'message': 'user name or email taken.'
+                'message': 'user name or email taken.',
+                'auth_token': None
             }
     except (Exception, psycopg2.DatabaseError) as error:
         if conn:
             conn.rollback()
         res = {
             'status': 'fail',
-            'message': 'Some error occurred. Please try again.'
+            'message': 'Some error occurred. Please try again.',
+            'auth_token': None
         }
     finally:
         if conn:
