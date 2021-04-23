@@ -73,26 +73,19 @@ services:
   #   depends_on:
   #     - postgres
   #     - api
-  # redis:
-  #   image: redis:6-alpine
-  #   depends_on:
-  #     - postgres
-  #     - api
-  #     - gnn_api
-  #     - db_api
-  # frontend:
-  #   container_name: frontend
-  #   build: ./dashboard
-  #   volumes:
-  #     - ./dashboard:/app
-  #     - /app/node_modules
-  #   ports:
-  #     - 3000:3000
-  #   environment:
-  #     - CHOKIDAR_USEPOLLING=true
-  #   depends_on:
-  #     - postgres
-  #     - api
-  #     - gnn_api
-  #     - db_api
-  #     - redis
+  frontend:
+    container_name: frontend
+    build: ./dashboard
+    volumes:
+      - ./dashboard:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - postgres
+      # - api
+      # - gnn_api
+      # - db_api
+      - login

@@ -5,6 +5,7 @@ import { PopUp } from "./components/PopUp";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { NavBar } from "./components/Navbar"
 import { DBTable } from "./components/DBTable";
+import { SignIn } from "./components/SignIn";
 import background from "./images/background.png";
 import ArrowDropDownCircleOutlinedIcon from '@material-ui/icons/ArrowDropDownCircleOutlined';
 import IconButton from '@material-ui/core/IconButton';
@@ -29,7 +30,8 @@ class App extends Component {
       search_keyword: null,
       search_sDate: null,
       search_eDate: null,
-      search_gType: null
+      search_gType: null,
+      user_token: null
     }
   }
 
@@ -100,6 +102,12 @@ class App extends Component {
       networkx_img: "data:image/png;base64," + nx
     })
   };
+
+  handleUserToken = (token) => {
+    this.setState({
+      user_token: token
+    })
+  }
 
   handleRowID = (id) => {
     this.setState({
@@ -186,63 +194,69 @@ class App extends Component {
   }
 
   render() {
-    return (
-      <div>
-        <div className="App">
-          <header className="App-header" style={{ backgroundImage: `url(${background})` }}>
-            <NavBar></NavBar>
-            <FileUpload
-              toggle={this.toggleOpen}
-              open={this.state.open}
-              handleImgChanges={this.handleImgChanges}
-              handlePredictionChanges={this.handlePredictionChanges}
-              updateTable={this.updateTable}
-              handleRowID={this.handleRowID}>
-            </FileUpload>
-            <IconButton
-              onClick={this.updateTable}
-              color="inherit"
-            >
-              {this.state.viewPast ?
-                <EjectOutlinedIcon fontSize="large" />
-                :
-                <ArrowDropDownCircleOutlinedIcon fontSize="large" />
-              }
-            </IconButton>
-            <PopUp
-              show={this.state.open}
-              onHide={this.toggleOpen}
-              arrow_img={this.state.arrow_img}
-              entity_img={this.state.entity_img}
-              networkx_img={this.state.networkx_img}
-              prediction={this.state.prediction}
-              prob_0={this.state.prob_0}
-              prob_1={this.state.prob_1}
-              content={this.state.content}
-              rowID={this.state.rowID}>
-            </PopUp>
-            {this.state.viewPast ?
-              <DBTable
+    if (this.state.user_token == null) {
+      return (
+        <SignIn handleUserToken={this.handleUserToken} />
+      );
+    } else {
+      return (
+        <div>
+          <div className="App">
+            <header className="App-header" style={{ backgroundImage: `url(${background})` }}>
+              <NavBar></NavBar>
+              <FileUpload
                 toggle={this.toggleOpen}
                 open={this.state.open}
-                onHide={this.toggleOpen}
                 handleImgChanges={this.handleImgChanges}
-                docs={this.state.files}
                 handlePredictionChanges={this.handlePredictionChanges}
-                handleRowID={this.handleRowID}
-                handleSearchKeyword={this.handleSearchKeyword}
-                handleSearchSelect={this.handleSearchSelect}
-                handleSearchDates={this.handleSearchDates}
-                searchTable={this.searchTable}
-                resetTable={this.resetTable}>
-              </DBTable>
-              :
-              null
-            }
-          </header>
-        </div>
-      </div >
-    );
+                updateTable={this.updateTable}
+                handleRowID={this.handleRowID}>
+              </FileUpload>
+              <IconButton
+                onClick={this.updateTable}
+                color="inherit"
+              >
+                {this.state.viewPast ?
+                  <EjectOutlinedIcon fontSize="large" />
+                  :
+                  <ArrowDropDownCircleOutlinedIcon fontSize="large" />
+                }
+              </IconButton>
+              <PopUp
+                show={this.state.open}
+                onHide={this.toggleOpen}
+                arrow_img={this.state.arrow_img}
+                entity_img={this.state.entity_img}
+                networkx_img={this.state.networkx_img}
+                prediction={this.state.prediction}
+                prob_0={this.state.prob_0}
+                prob_1={this.state.prob_1}
+                content={this.state.content}
+                rowID={this.state.rowID}>
+              </PopUp>
+              {this.state.viewPast ?
+                <DBTable
+                  toggle={this.toggleOpen}
+                  open={this.state.open}
+                  onHide={this.toggleOpen}
+                  handleImgChanges={this.handleImgChanges}
+                  docs={this.state.files}
+                  handlePredictionChanges={this.handlePredictionChanges}
+                  handleRowID={this.handleRowID}
+                  handleSearchKeyword={this.handleSearchKeyword}
+                  handleSearchSelect={this.handleSearchSelect}
+                  handleSearchDates={this.handleSearchDates}
+                  searchTable={this.searchTable}
+                  resetTable={this.resetTable}>
+                </DBTable>
+                :
+                null
+              }
+            </header>
+          </div>
+        </div >
+      );
+    }
   }
 }
 

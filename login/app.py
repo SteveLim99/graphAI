@@ -98,12 +98,14 @@ def login_user():
             else:
                 res = {
                     'status': 'fail',
-                    'message': 'Incorrect Password.'
+                    'message': 'Incorrect Password.',
+                    'auth_token': None
                 }
         else:
             res = {
                 'status': 'fail',
-                'message': 'User does not exist.'
+                'message': 'User does not exist.',
+                'auth_token': None
             }
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
@@ -111,7 +113,8 @@ def login_user():
             conn.rollback()
         res = {
             'status': 'fail',
-            'message': 'Some error occurred. Please try again.'
+            'message': 'Some error occurred. Please try again.',
+            'auth_token': None
         }
     finally:
         if conn:

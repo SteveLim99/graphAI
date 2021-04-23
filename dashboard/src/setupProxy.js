@@ -31,4 +31,14 @@ module.exports = function (app) {
             }
         })
     );
+    app.use(
+        '/user',
+        createProxyMiddleware({
+            target: 'http://login:5003',
+            changeOrigin: true,
+            pathRewrite: {
+                '^/user': ''
+            }
+        })
+    );
 };
