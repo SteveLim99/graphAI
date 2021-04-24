@@ -13,7 +13,8 @@ $ npm install --global yarn
 ```
 $ docker-compose up
 ```
-5. Removing the containers 
+5. You can access the web-application at http://localhost:3000/
+6. Removing the containers 
 ```
 $ docker-compose down
 ```
@@ -52,7 +53,8 @@ cqbsc7pkn7en   graphai_webapp_login           replicated   1/1        127.0.0.1:
 rv57qu93h6ho   graphai_webapp_postgres        replicated   1/1        postgres:alpine                       *:5432->5432/tcp
 ```
 - The container_id should ressemble a hash
-7. Removing the swarm service
+7. You can access the web-application at http://localhost:3000/
+8. Removing the swarm service
 ```
 $ docker stack rm graphai_webapp
 $ docker swarm leave -f
