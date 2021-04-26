@@ -1,10 +1,4 @@
-CREATE or replace FUNCTION public.getall(
-	result_offset integer default 0,
-	keyword text default null,
-	start_year date default null,
-	end_year date default null,
-	graph_type integer default null
-) RETURNS TABLE(id integer, name character varying, input_date timestamp without time zone, gtype character varying, context text, arr text, ent text, nx text, probs numeric[])
+CREATE FUNCTION public.getall(result_offset integer DEFAULT 0, keyword text DEFAULT NULL::text, start_year date DEFAULT NULL::date, end_year date DEFAULT NULL::date, graph_type integer DEFAULT NULL::integer, input_uid integer DEFAULT NULL::integer) RETURNS TABLE(id integer, name character varying, input_date timestamp without time zone, gtype character varying, context text, arr text, ent text, nx text, probs numeric[])
     LANGUAGE plpgsql
     AS $$
 	begin 
@@ -39,5 +33,7 @@ CREATE or replace FUNCTION public.getall(
 			(end_year ISNULL or files.input_date::date <= end_year)
 			and
 			(graph_type ISNULL or g.gid = graph_type)
+			and
+			(files.uid = input_uid)
 			group by files.id, g.gtype, g.context, im.arr, im.ent, im.nx, p.probs;
 end;$$;
