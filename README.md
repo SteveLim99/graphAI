@@ -5,8 +5,8 @@
 - database.env
 - pgadmin.env
 - jwtsecret.env
-Edit the database.env and pgadmin.env files accordingly to your preference. However, we advise to set the JWT key to a randomly generated key which is at least 256 bit.
-2. Skip this step if yarn is already installed globally. Otherwise, run the following command 
+2. Edit the database.env and pgadmin.env files accordingly to your preference. However, we advise to set the JWT key to a randomly generated key which is at least 256 bit.
+3. Skip this step if yarn is already installed globally. Otherwise, run the following command 
 ```
 $ npm install --global yarn
 ```
