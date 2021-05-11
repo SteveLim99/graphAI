@@ -9,11 +9,12 @@ import os
 class CsvToNetworkx():
     CSV_PATH = ""
 
-    def __init__(self, CSV_PATH):
+    def __init__(self, CSV_PATH, fileName):
         super().__init__()
         self.CSV_PATH = CSV_PATH
         self.PD_ARROW_PATH = CSV_PATH + "detection_output_arrow.csv"
         self.PD_ENTITY_PATH = CSV_PATH + "detection_output_entity.csv"
+        self.fileName = fileName
 
     def intersection(self, xmin, ymin, xmax, ymax, node_xmin, node_ymin, node_xmax, node_ymax):
         # Calculate intersecting boundaries
@@ -83,9 +84,10 @@ class CsvToNetworkx():
         plt.ioff()
         fig = plt.figure()
         nx.draw(G, pos, with_labels=True, node_color=color_seq)
-        plt.savefig(root + "/data/predictions/networkx.png")
+        plt.savefig(root + "/data/predictions/" + self.fileName + "_nx.png")
         plt.close(fig)
 
-        nx.write_gml(G, root + '/data/predictions/network_obj.gml')
+        nx.write_gml(G, root + '/data/predictions/' +
+                     self.fileName + '_nx.gml')
 
         return G

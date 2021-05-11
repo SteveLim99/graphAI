@@ -9,13 +9,15 @@ import csv_to_networkx
 from lib.utils.login import verify_token
 from dotenv import dotenv_values
 import psycopg2
+import hashlib
+import datetime
 
 jwt_config = dotenv_values("./env/jwt_secret.env")
 database_config = dotenv_values("./env/database.env")
 
 app = Flask(__name__)
-UPLOAD_FOLDER = os.getcwd() + "/data/uploads"
-DOWNLOAD_FOLDER = os.getcwd() + "/data/predictions"
+UPLOAD_FOLDER = os.getcwd() + "/data/uploads/"
+DOWNLOAD_FOLDER = os.getcwd() + "/data/predictions/"
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['DOWNLOAD_FOLDER'] = DOWNLOAD_FOLDER
@@ -41,6 +43,7 @@ def upload():
             token, cursor, jwt_config["SECRET_KEY"])
         token_status = token_verification["status"]
         token_msg = token_verification["message"]
+        uid = token_verification["uid"]
 
         if token_status:
             if 'file' not in request.files:
@@ -49,13 +52,16 @@ def upload():
             if file.filename == '':
                 res["message"] = "No Selected File"
             if file and validateFileExtension(file.filename):
-                file.save(os.path.join(
-                    app.config['UPLOAD_FOLDER'], "input_file.png"))
-                file_name = open(os.path.join(
-                    app.config['UPLOAD_FOLDER'], "file_name.txt"), 'w')
-                file_name.write(file.filename)
-                file_name.close()
+                # file_name = open(os.path.join(
+                #     app.config['UPLOAD_FOLDER'], "file_name.txt"), 'w')
+                # file_name.write(file.filename)
+                # file_name.close()
+                file_name_hash = generateFileNameHash(file.filename)
+                file_name = file_name_hash + "_input.png"
                 root = os.getcwd()
+
+                file.save(os.path.join(
+                    app.config['UPLOAD_FOLDER'], file_name))
 
                 imgd_entity = detect_image.ImageDetect(
                     MODEL_NAME="new_graph_rcnn",
@@ -63,8 +69,8 @@ def upload():
                     PATH_TO_LABELS=root + "/entity_model/object-detection.pbtxt",
                     NUM_CLASSES=3,
                     EXPORT_PATH=app.config['DOWNLOAD_FOLDER'],
-                    IMAGE_PATH=app.config['UPLOAD_FOLDER'] + "/input_file.png",
-                    EXPORT_NAME="detection_output_entity"
+                    IMAGE_PATH=app.config['UPLOAD_FOLDER'] + file_name,
+                    EXPORT_NAME=file_name_hash + "_ent"
                 )
 
                 imgd_arrow = detect_image.ImageDetect(
@@ -73,15 +79,16 @@ def upload():
                     PATH_TO_LABELS=root + "/arrow_model/object-detection.pbtxt",
                     NUM_CLASSES=1,
                     EXPORT_PATH=app.config['DOWNLOAD_FOLDER'],
-                    IMAGE_PATH=app.config['UPLOAD_FOLDER'] + "/input_file.png",
-                    EXPORT_NAME="detection_output_arrow"
+                    IMAGE_PATH=app.config['UPLOAD_FOLDER'] + file_name,
+                    EXPORT_NAME=file_name_hash + "_arr"
                 )
 
                 imgd_arrow.predict()
                 imgd_entity.predict()
 
                 Conv_nx = csv_to_networkx.CsvToNetworkx(
-                    CSV_PATH=app.config['DOWNLOAD_FOLDER'] + "/")
+                    CSV_PATH=app.config['DOWNLOAD_FOLDER'] + "/",
+                    fileName=file_name_hash)
                 G = Conv_nx.convert()
 
                 prediction_path = app.config['DOWNLOAD_FOLDER'] + "/"
@@ -90,17 +97,18 @@ def upload():
                 entity_img = None
                 networkx_img = None
                 for path in paths:
-                    if(path.endswith("arrow.png")):
+                    if(path.endswith("_arr.png")):
                         arrow_img = get_response_image(prediction_path + path)
-                    elif(path.endswith("entity.png")):
+                    elif(path.endswith("_ent.png")):
                         entity_img = get_response_image(prediction_path + path)
-                    elif(path.endswith("networkx.png")):
+                    elif(path.endswith("_nx.png")):
                         networkx_img = get_response_image(
                             prediction_path + path)
                 res = {
                     'arrow_img': arrow_img,
                     "entity_img": entity_img,
                     "networkx_img": networkx_img,
+                    'file_name_hash': file_name_hash,
                     "status": "success",
                     "message": "RCNN Detection Succeeded."
                 }
@@ -131,3 +139,12 @@ def get_response_image(image_path):
 
 def validateFileExtension(fileExtension):
     return '.' in fileExtension and fileExtension.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def generateFileNameHash(fileName):
+    file_name = fileName + \
+        str(uid) + str(datetime.datetime.now())
+    b_file_name = bytes(file_name, 'utf-8')
+    hash_obj = hashlib.sha1(b_file_name)
+    new_file_name = hash_obj.hexdigest()
+    return new_file_name

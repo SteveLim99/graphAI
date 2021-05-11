@@ -3,6 +3,8 @@ import { Form, Button } from "react-bootstrap";
 import styled from "styled-components";
 import axios from "axios";
 import { LinearProgress } from '@material-ui/core';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 const Styles = styled.div`
 
@@ -39,38 +41,74 @@ export class FileUpload extends Component {
     super(props);
     this.state = {
       uploadedFile: null,
+      gcType: true,
       fileUploadLabel: "Attach a File",
-      title: "Insert File to Get Started"
+      title: "Insert File to Get Started",
+      gcTitle: "KSVM Image Classification"
+    }
+  }
+
+  handleGcChoice = () => {
+    if (this.state.gcType) {
+      this.setState({
+        gcType: false,
+        gcTitle: "Graph Neural Networks Graph Classification"
+      })
+    } else {
+      this.setState({
+        gcType: true,
+        gcTitle: "KSVM Image Classification"
+      })
     }
   }
 
   handleChanges = e => {
     e.preventDefault();
-    this.setState({
-      uploadedFile: e.target.files[0],
-      fileUploadLabel: e.target.files[0].name
-    });
+    // File types are validated on upload 
+    var accept_types = /(\.jpg|\.jpeg|\.png)$/i;
+    var file = e.target.files[0];
+
+    if (!accept_types.exec(file.name)) {
+      this.setState({
+        fileUploadLabel: "Invalid File Type. Please Try Again."
+      })
+    } else {
+      this.setState({
+        uploadedFile: file,
+        fileUploadLabel: file.name
+      });
+    }
   };
 
   handleSubmit = async e => {
+    e.preventDefault();
     const loader = document.getElementById("loading");
     const loader_upload = document.getElementById("loading-items");
     const loader_button = document.getElementById("loading-button");
+    const loader_gc_choice = document.getElementById('loading-gc-choice');
+
     const token = "token=" + this.props.user_token;
 
     loader.style.display = "flex";
     loader_upload.style.display = 'none';
     loader_button.style.display = 'none';
+    loader_gc_choice.style.display = 'none';
 
     this.setState({
       title: "Generating Prediction"
     })
 
-    e.preventDefault();
     const form = document.querySelector("#form-group");
-    const { uploadedFile } = this.state;
+    const { uploadedFile, gcType, fileUploadLabel } = this.state;
     const formData = new FormData();
     formData.append("file", uploadedFile);
+
+    const gcChoice = "";
+    if (gcType === true) {
+      gcChoice = "ksvm";
+    } else {
+      gcChoice = "gnn"
+    }
 
     try {
       var res = await axios.post(
@@ -85,18 +123,21 @@ export class FileUpload extends Component {
           const arr = res.data["arrow_img"];
           const ent = res.data["entity_img"];
           const nx = res.data["networkx_img"];
+          const fname_hash = res.data["file_name_hash"];
           this.props.handleImgChanges(arr, ent, nx)
 
           this.setState({
-            title: "Running GNN Model..."
+            title: "Running Graph Classification Model..."
           })
 
           var pred = ""
           var p0 = ""
           var p1 = ""
 
+          const graph_method = "&gcType=" + gcChoice;
+          const fname_hash = "&fname_hash=" + fname_hash;
           var gnn_res = await axios.post(
-            "/gnn/gmlUpload?" + token,
+            "/gnn/gmlUpload?" + token + graph_method + fname_hash,
             {}
           );
 
@@ -172,6 +213,8 @@ export class FileUpload extends Component {
       loader.style.display = "none";
       loader_upload.style.display = 'block';
       loader_button.style.display = 'block';
+      loader_gc_choice.style.display = 'block';
+
       this.setState({
         fileUploadLabel: "Attach a File",
         title: "Insert File to Get Started"
@@ -208,9 +251,16 @@ export class FileUpload extends Component {
                   id="passwordHelpInline"
                   muted>
                   Uploaded file must be of type .jpeg or .png
-              </Form.Text>
+                </Form.Text>
               </div>
             </Form.Group>
+            <Form.Row>
+              <FormControlLabel
+                control={<Switch name="gcType" onChange={this.handleGcChoice} />}
+                label={this.state.gcTitle}
+                id='loading-gc-choice'
+              />
+            </Form.Row>
             <Form.Row>
               <Button
                 variant="outline-light"

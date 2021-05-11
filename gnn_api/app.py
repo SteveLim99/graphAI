@@ -15,8 +15,10 @@ database_config = dotenv_values("./env/database.env")
 app = Flask(__name__)
 GML_MODEL = os.getcwd() + "/gcn_model"
 app.config['GML_MODEL'] = GML_MODEL
-NETWORK_FILE = os.getcwd() + "/data/predictions/network_obj.gml"
+PREDICTION_FILE_PATH = os.getcwd() + "/data/predictions/"
 app.config['NETWORK_FILE'] = NETWORK_FILE
+INPUT_FILE_PATH = os.getcwd() + "/data/uploads/"
+app.config['INPUT_FILE_PATH'] = INPUT_FILE_PATH
 DOCUMENTATION_FILE = os.getcwd() + "/documentation/"
 app.config['DOCUMENTATION_FILE'] = DOCUMENTATION_FILE
 
@@ -44,10 +46,16 @@ def upload():
         token_msg = token_verification["message"]
 
         if token_status:
-            gnn_model = model.Classifier(1, 256, 2)
+            gcType = request.args.get("gcType")
+            fname_hash = request.args.get("fname_hash")
 
+            input_graph = nx.read_gml(
+                app.config['PREDICTION_FILE_PATH'] + fname_hash + "_nx.gml")
+            input_image = app.config['INPUT_FILE_PATH'] + \
+                fname_hash + "_input.png"
+
+            gnn_model = model.Classifier(1, 256, 2)
             gnn_model.load_state_dict(torch.load(app.config['GML_MODEL']))
-            input_graph = nx.read_gml(app.config['NETWORK_FILE'])
 
             graph = dgl.from_networkx(input_graph)
             graph = dgl.add_self_loop(graph)
