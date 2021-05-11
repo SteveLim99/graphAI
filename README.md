@@ -1,10 +1,11 @@
 # graphAI_webapp
 
 ## Running the Development Environment
-1. Create a file called "env" at ./ and enter the environmental variables as specified in ./env_example. There are two files to edit:
+1. Create a file called "env" at ./ and enter the environmental variables as specified in ./env_example. There are 3 files to edit:
 - database.env
 - pgadmin.env
-2. Under ./db_api/, create a folder called "secrets.py" and fill in the environmental variables as stated in ./db_api/secrets_example.py
+- jwtsecret.env
+2. Edit the database.env and pgadmin.env files accordingly to your preference. However, we advise to set the JWT key to a randomly generated key which is at least 256 bit.
 3. Skip this step if yarn is already installed globally. Otherwise, run the following command 
 ```
 $ npm install --global yarn
