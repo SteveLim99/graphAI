@@ -76,7 +76,7 @@ services:
       - ./env:/code/env
       - ./lib:/code/lib
     environment:
-      FLASK_ENV: production
+      FLASK_ENV: development
     depends_on:
       - postgres
       - api

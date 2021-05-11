@@ -103,7 +103,7 @@ export class FileUpload extends Component {
     const formData = new FormData();
     formData.append("file", uploadedFile);
 
-    const gcChoice = "";
+    var gcChoice = "";
     if (gcType === true) {
       gcChoice = "ksvm";
     } else {
@@ -135,9 +135,9 @@ export class FileUpload extends Component {
           var p1 = ""
 
           const graph_method = "&gcType=" + gcChoice;
-          const fname_hash = "&fname_hash=" + fname_hash;
+          const fname = "&fname_hash=" + fname_hash;
           var gnn_res = await axios.post(
-            "/gnn/gmlUpload?" + token + graph_method + fname_hash,
+            "/gnn/gmlUpload?" + token + graph_method + fname,
             {}
           );
 
@@ -155,8 +155,9 @@ export class FileUpload extends Component {
               const pred_endpoint = "?pred=" + pred;
               const bpnm_prob_endpoint = "&BPNM=" + p0;
               const swimlane_prob_endpoint = "&Swimlane=" + p1;
+              const ori_file_name = "&inputName=" + fileUploadLabel;
 
-              const endpoint = "/db/dbConnect" + pred_endpoint + bpnm_prob_endpoint + swimlane_prob_endpoint + "&" + token;
+              const endpoint = "/db/dbConnect" + pred_endpoint + bpnm_prob_endpoint + swimlane_prob_endpoint + "&" + token + fname + ori_file_name;
               var db_res = await axios.post(
                 endpoint,
                 {}

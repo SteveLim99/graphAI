@@ -31,7 +31,7 @@ class App extends Component {
       search_sDate: null,
       search_eDate: null,
       search_gType: null,
-      user_token: 1
+      user_token: null
     }
   }
 

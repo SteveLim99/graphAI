@@ -12,8 +12,8 @@ class CsvToNetworkx():
     def __init__(self, CSV_PATH, fileName):
         super().__init__()
         self.CSV_PATH = CSV_PATH
-        self.PD_ARROW_PATH = CSV_PATH + "detection_output_arrow.csv"
-        self.PD_ENTITY_PATH = CSV_PATH + "detection_output_entity.csv"
+        self.PD_ARROW_PATH = CSV_PATH + fileName + "_arr.csv"
+        self.PD_ENTITY_PATH = CSV_PATH + fileName + "_ent.csv"
         self.fileName = fileName
 
     def intersection(self, xmin, ymin, xmax, ymax, node_xmin, node_ymin, node_xmax, node_ymax):

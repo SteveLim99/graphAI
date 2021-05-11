@@ -56,7 +56,7 @@ def upload():
                 #     app.config['UPLOAD_FOLDER'], "file_name.txt"), 'w')
                 # file_name.write(file.filename)
                 # file_name.close()
-                file_name_hash = generateFileNameHash(file.filename)
+                file_name_hash = generateFileNameHash(file.filename, uid)
                 file_name = file_name_hash + "_input.png"
                 root = os.getcwd()
 
@@ -116,11 +116,9 @@ def upload():
             res["message"] = token_msg
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-        retries += 1
         res["message"] = error
         if conn:
             conn.rollback()
-        print("Retry Attempt: " + str(retries) + " / " + str(max_retry))
     finally:
         if conn:
             conn.close()
@@ -141,7 +139,7 @@ def validateFileExtension(fileExtension):
     return '.' in fileExtension and fileExtension.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def generateFileNameHash(fileName):
+def generateFileNameHash(fileName, uid):
     file_name = fileName + \
         str(uid) + str(datetime.datetime.now())
     b_file_name = bytes(file_name, 'utf-8')

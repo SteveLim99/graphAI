@@ -49,18 +49,20 @@ def connectToDB():
 
             if token_status:
                 if request.method == 'POST':
+
                     pred = request.args.get("pred")
+                    ori_input_name = request.args.get("inputName")
+                    fname_hash = request.args.get("fname_hash")
+
                     gid = graphs[pred]
 
-                    fName_file = open(app.config['UPLOAD_FOLDER'] +
-                                      "file_name.txt", 'r')
-                    file_name = fName_file.readline()
+                    file_name = ori_input_name
                     arrow = encode_img(app.config['DOWNLOAD_FOLDER'] +
-                                       "detection_output_arrow.png")
+                                       fname_hash + "_arr.png")
                     entity = encode_img(app.config['DOWNLOAD_FOLDER'] +
-                                        "detection_output_entity.png")
+                                        fname_hash + "_ent.png")
                     nx_img = encode_img(
-                        app.config['DOWNLOAD_FOLDER'] + "networkx.png")
+                        app.config['DOWNLOAD_FOLDER'] + fname_hash + "_nx.png")
 
                     date = datetime.today().strftime('%Y-%m-%d  %H:%M:%S')
                     statement = "INSERT INTO files(name, input_date, uid) VALUES(%s, TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS'), %s) RETURNING id"
@@ -80,7 +82,7 @@ def connectToDB():
                         gid = graphs[key]
                         cursor.execute(statement, (file_id, gid, probs,))
 
-                    tmp = readFiles()
+                    tmp = readFiles(fname_hash)
 
                     if tmp:
                         arr_file, ent_file, nx_file = tmp
@@ -94,6 +96,7 @@ def connectToDB():
 
                     conn.commit()
                     processed = True
+                    deleteTemporaryFiles(fname_hash)
                     res = {"fileUploaded": str(processed),
                            "graphID": str(file_id),
                            "status": "success",
@@ -334,18 +337,18 @@ def encode_img(image_path):
     return encoded_img
 
 
-def readFiles():
+def readFiles(fileName):
     arr_fin, ent_fin, nx_fin = None, None, None
     arr_file, ent_file, nx_file = None, None, None
     res = None
 
     try:
         arr_fin = open(
-            (app.config['DOWNLOAD_FOLDER'] + "detection_output_arrow.png"), "rb")
+            (app.config['DOWNLOAD_FOLDER'] + fileName + "_arr.png"), "rb")
         ent_fin = open(
-            (app.config['DOWNLOAD_FOLDER'] + "detection_output_entity.png"), "rb")
+            (app.config['DOWNLOAD_FOLDER'] + fileName + "_ent.png"), "rb")
         nx_fin = open(
-            (app.config['DOWNLOAD_FOLDER'] + "network_obj.gml"), "rb")
+            (app.config['DOWNLOAD_FOLDER'] + fileName + "_nx.gml"), "rb")
 
         arr_file = arr_fin.read()
         ent_file = ent_fin.read()
@@ -363,3 +366,13 @@ def readFiles():
         if nx_fin:
             nx_fin.close()
         return res
+
+
+def deleteTemporaryFiles(fileName):
+    os.remove(app.config['UPLOAD_FOLDER'] + fileName + "_input.png")
+    os.remove(app.config['DOWNLOAD_FOLDER'] + fileName + "_arr.png")
+    os.remove(app.config['DOWNLOAD_FOLDER'] + fileName + "_ent.png")
+    os.remove(app.config['DOWNLOAD_FOLDER'] + fileName + "_nx.png")
+    os.remove(app.config['DOWNLOAD_FOLDER'] + fileName + "_nx.gml")
+    os.remove(app.config['DOWNLOAD_FOLDER'] + fileName + "_arr.csv")
+    os.remove(app.config['DOWNLOAD_FOLDER'] + fileName + "_ent.csv")
