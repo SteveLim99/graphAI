@@ -11,6 +11,7 @@ from lib.utils.login import verify_token
 from lib.utils.utils import deleteTemporaryFiles
 import sys
 from dotenv import dotenv_values
+import time
 
 jwt_config = dotenv_values("./env/jwt_secret.env")
 database_config = dotenv_values("./env/database.env")
@@ -80,13 +81,18 @@ def connectToDB():
                         cursor.execute(
                             statement, (file_id, arr_binary_data, ent_binary_data, nx_binary_data, nx_png_binary_data,))
 
-                    conn.commit()
-                    processed = True
-                    deleteTemporaryFiles(app.config['UPLOAD_FOLDER'], app.config['DOWNLOAD_FOLDER'], fname_hash)
-                    res = {"fileUploaded": str(processed),
-                           "graphID": str(file_id),
-                           "status": "success",
-                           "message": "Upload Succesful"}
+                        conn.commit()
+                        processed = True
+                        deleteTemporaryFiles(app.config['UPLOAD_FOLDER'], app.config['DOWNLOAD_FOLDER'], fname_hash)
+                        res = {"fileUploaded": str(processed),
+                            "graphID": str(file_id),
+                            "status": "success",
+                            "message": "Upload Succesful"}
+                    else:
+                        res = {
+                            "status": "fail",
+                            "message": "File not present in file system."
+                        }
                     break
 
                 elif request.method == 'GET':
@@ -126,14 +132,6 @@ def connectToDB():
                         db_ent = row[6]
                         db_nx = row[7]
 
-                        db_arr_bytes = base64.b64encode(db_arr)
-                        db_ent_bytes = base64.b64encode(db_ent)
-                        db_nx_bytes = base64.b64encode(db_nx)
-
-                        db_arr_msg = db_arr_bytes.decode('ascii')
-                        db_ent_msg = db_ent_bytes.decode('ascii')
-                        db_nx_msg = db_nx_bytes.decode('ascii')
-
                         db_probs = [str(i) for i in row[8]]
 
                         files_id.append(db_id)
@@ -144,16 +142,22 @@ def connectToDB():
                         files_probs.append(db_probs)
 
                         if db_arr != None:
+                            db_arr_bytes = base64.b64encode(db_arr)
+                            db_arr_msg = db_arr_bytes.decode('ascii')
                             file_img_arr.append(db_arr_msg)
                         else:
                             file_img_arr.append("")
 
                         if db_ent != None:
+                            db_ent_bytes = base64.b64encode(db_ent)
+                            db_ent_msg = db_ent_bytes.decode('ascii')
                             file_img_ent.append(db_ent_msg)
                         else:
                             file_img_ent.append("")
 
                         if db_nx != None:
+                            db_nx_bytes = base64.b64encode(db_nx)
+                            db_nx_msg = db_nx_bytes.decode('ascii')
                             file_img_nx.append(db_nx_msg)
                         else:
                             file_img_nx.append("")
@@ -182,9 +186,14 @@ def connectToDB():
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
             retries += 1
+            time.sleep(5)
             if conn:
                 conn.rollback()
             print("Retry Attempt: " + str(retries) + " / " + str(max_retry))
+            res = {
+                'status': "fail",
+                "message": "An unexpected error ocurred."
+            }
     if conn:
         conn.close()
     return res
@@ -194,66 +203,81 @@ def connectToDB():
 def downloadFileFromDB():
     graph_id = request.args.get("id")
     file_type = request.args.get("file")
+    token = request.args.get("token")
 
     retries = 0
     max_retry = app.config['DB_MAX_RETRIES']
     conn = None
     res = {}
 
-    while retries != max_retry:
-        try:
-            if file_type == '0' or file_type == '1' or file_type == '2':
-                file = ""
-                filename = str(graph_id) + "_"
-                if file_type == '0':
-                    file = "arr_file"
-                    filename += "arrow.png"
-                if file_type == '1':
-                    file = "ent_file"
-                    filename += "entity.png"
-                if file_type == '2':
-                    file = "nx_file"
-                    filename += "nx_obj.gml"
-
-                conn = psycopg2.connect(
-                    host=database_config["POSTGRES_HOST"],
-                    database=database_config["POSTGRES_DB"],
-                    user=database_config["POSTGRES_USER"],
-                    password=database_config["POSTGRES_PASSWORD"]
-                )
-                cursor = conn.cursor()
-                token = request.args.get("token")
-                token_verification = verify_token(
-                    token, cursor, jwt_config["SECRET_KEY"])
-                token_status = token_verification["status"]
-                token_msg = token_verification["message"]
-                token_uid = token_verification["uid"]
-
-                if token_status:
-                    statement = "SELECT %s FROM files where id = %s"
-                    cursor.execute(statement, (AsIs(file), graph_id,))
-                    bdata = cursor.fetchone()[0]
-
-                    return send_file(
-                        io.BytesIO(bdata),
-                        as_attachment=True,
-                        attachment_filename=filename
+    if graph_id != None and file_type != None:
+        while retries != max_retry:
+            try:
+                if file_type == '0' or file_type == '1' or file_type == '2':
+                    file = ""
+                    filename = str(graph_id) + "_"
+                    if file_type == '0':
+                        file = "arr_file"
+                        filename += "arrow.png"
+                    if file_type == '1':
+                        file = "ent_file"
+                        filename += "entity.png"
+                    if file_type == '2':
+                        file = "nx_file"
+                        filename += "nx_obj.gml"
+                    
+                    conn = psycopg2.connect(
+                        host=database_config["POSTGRES_HOST"],
+                        database=database_config["POSTGRES_DB"],
+                        user=database_config["POSTGRES_USER"],
+                        password=database_config["POSTGRES_PASSWORD"]
                     )
+                    cursor = conn.cursor()
 
+                    token_verification = verify_token(
+                        token, cursor, jwt_config["SECRET_KEY"])
+                    token_status = token_verification["status"]
+                    token_msg = token_verification["message"]
+                    token_uid = token_verification["uid"]
+
+                    if token_status:
+                        statement = "SELECT %s FROM files where id = %s"
+                        cursor.execute(statement, (AsIs(file), graph_id,))
+                        bdata = cursor.fetchone()[0]
+
+                        return send_file(
+                            io.BytesIO(bdata),
+                            as_attachment=True,
+                            download_name=filename
+                        )
+
+                    else:
+                        res = {
+                            'status': 'fail',
+                            'message': token_msg
+                        }
+                        break
                 else:
                     res = {
                         'status': 'fail',
-                        'message': token_msg
+                        'message': "Invalid File Type."
                     }
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
-            retries += 1
-            if conn:
-                conn.rollback()
-            print("Retry Attempt: " + str(retries) + " / " + str(max_retry))
-            res = {
+                    break
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                retries += 1
+                if conn:
+                    conn.rollback()
+                print("Retry Attempt: " + str(retries) + " / " + str(max_retry))
+                time.sleep(5)
+                res = {
+                    'status': 'fail',
+                    'message': error
+                }
+    else:
+        res = {
                 'status': 'fail',
-                'message': error
+                'message': "Missing Parameters"
             }
     if conn:
         conn.close()
@@ -263,6 +287,7 @@ def downloadFileFromDB():
 @app.route('/dbDeleteFile', methods=['POST'])
 def deleteFileFromDB():
     graph_id = request.args.get('id')
+    token = request.args.get("token")
 
     retries = 0
     max_retry = app.config['DB_MAX_RETRIES']
@@ -270,62 +295,72 @@ def deleteFileFromDB():
     deleted = False
     res = None
 
-    while retries != max_retry:
-        try:
-            print("Values currently being processed")
-            input_id_int = int(graph_id)
+    if graph_id != None:
+        while retries != max_retry:
+            try:
+                input_id_int = int(graph_id)
 
-            conn = psycopg2.connect(
-                host=database_config["POSTGRES_HOST"],
-                database=database_config["POSTGRES_DB"],
-                user=database_config["POSTGRES_USER"],
-                password=database_config["POSTGRES_PASSWORD"]
-            )
-            cursor = conn.cursor()
-            token = request.args.get("token")
-            token_verification = verify_token(
-                token, cursor, jwt_config["SECRET_KEY"])
-            token_status = token_verification["status"]
-            token_msg = token_verification["message"]
-            token_uid = token_verification["uid"]
+                conn = psycopg2.connect(
+                    host=database_config["POSTGRES_HOST"],
+                    database=database_config["POSTGRES_DB"],
+                    user=database_config["POSTGRES_USER"],
+                    password=database_config["POSTGRES_PASSWORD"]
+                )
+                cursor = conn.cursor()
+                
+                token_verification = verify_token(
+                    token, cursor, jwt_config["SECRET_KEY"])
+                token_status = token_verification["status"]
+                token_msg = token_verification["message"]
+                token_uid = token_verification["uid"]
 
-            if token_status:
-                statement = "SELECT * FROM delete_prediction(%s)"
-                cursor.execute(statement, (input_id_int,))
-                conn.commit()
-                deleted = True
-                res = {
-                    'status': 'success',
-                    'message': 'File Deleted'
-                }
+                if token_status:
+                    statement = "SELECT * FROM delete_prediction(%s)"
+                    cursor.execute(statement, (input_id_int,))
+                    conn.commit()
+                    deleted = True
+                    res = {
+                        'status': 'success',
+                        'message': 'File Deleted'
+                    }
 
-            else:
+                else:
+                    res = {
+                        'status': 'fail',
+                        'message': token_msg
+                    }
+                break
+            except(Exception, psycopg2.DatabaseError, ValueError) as error:
+                print(error)
+                retries += 1
+                if type(error).__name__ == "ValueError":
+                    print("Value Provided is not of type Integer")
+                    res = {
+                        'status': 'fail',
+                        'message': "Value Provided is not of type Integer"
+                    }
+                    break
+                if conn:
+                    conn.rollback()
+                    print("Retry Attempt: " + str(retries) +
+                        " / " + str(max_retry))
+                time.sleep(5)
                 res = {
                     'status': 'fail',
-                    'message': token_msg
+                    'message': error
                 }
-            break
-        except(Exception, psycopg2.DatabaseError, ValueError) as error:
-            print(error)
-            retries += 1
-            if type(error).__name__ == "ValueError":
-                print("Value Provided is not of type Integer")
-                break
-            if conn:
-                conn.rollback()
-                print("Retry Attempt: " + str(retries) +
-                      " / " + str(max_retry))
-            res = {
-                'status': 'fail',
-                'message': error
-            }
+    else:
+        res = {
+            'status': 'fail',
+            'message': "Missing Parameters"
+        }
     if conn:
         conn.close()
     return res
 
 def readFiles(fileName):
-    arr_fin, ent_fin, nx_fin = None, None, None
-    arr_file, ent_file, nx_file = None, None, None
+    arr_fin, ent_fin, nx_fin, nx_png_fin = None, None, None, None
+    arr_file, ent_file, nx_file, nx_png_file = None, None, None, None
     res = None
 
     try:

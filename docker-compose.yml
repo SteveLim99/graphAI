@@ -24,21 +24,21 @@ services:
       - postgres
     logging:
       driver: "none"
-  # db_api:
-  #   container_name: db_api
-  #   build: ./db_api
-  #   ports:
-  #     - "127.0.0.1:5002:5002"
-  #   volumes:
-  #     - ./db_api:/code
-  #     - ./data:/code/data
-  #     - ./env:/code/env
-  #     - ./lib:/code/lib
-  #     - ./test:/code/test
-  #   environment:
-  #     FLASK_ENV: development
-  #   depends_on:
-  #     - postgres
+  db_api:
+    container_name: db_api
+    build: ./db_api
+    ports:
+      - "127.0.0.1:5002:5002"
+    volumes:
+      - ./db_api:/code
+      - ./data:/code/data
+      - ./env:/code/env
+      - ./lib:/code/lib
+      - ./test:/code/test
+    environment:
+      FLASK_ENV: development
+    depends_on:
+      - postgres
   # api:
   #   container_name: api
   #   build: ./api
@@ -68,22 +68,22 @@ services:
       FLASK_ENV: development
     depends_on:
       - postgres
-  gnn_api:
-    container_name: gnn_api
-    build: ./gnn_api
-    ports:
-      - "127.0.0.1:5001:5001"
-    volumes:
-      - ./gnn_api:/code
-      - ./data:/code/data
-      - ./env:/code/env
-      - ./lib:/code/lib
-      - ./test:/code/test
-    environment:
-      FLASK_ENV: development
-    depends_on:
-      - postgres
-      # - api
+  # gnn_api:
+  #   container_name: gnn_api
+  #   build: ./gnn_api
+  #   ports:
+  #     - "127.0.0.1:5001:5001"
+  #   volumes:
+  #     - ./gnn_api:/code
+  #     - ./data:/code/data
+  #     - ./env:/code/env
+  #     - ./lib:/code/lib
+  #     - ./test:/code/test
+  #   environment:
+  #     FLASK_ENV: development
+  #   depends_on:
+  #     - postgres
+  #     - api
   # frontend:
   #   container_name: frontend
   #   build: ./dashboard
