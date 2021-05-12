@@ -5,3 +5,5 @@ torch
 PyJWT==2.0.1
 python-dotenv==0.17.0
 psycopg2
+coverage
+pytest

@@ -25,6 +25,7 @@ test_user = test_config["EXISTING_USER"]
 test_email = test_config["EXISTING_EMAIL"]
 test_pin = test_config["EXISTING_PIN"]
 blacklisted_token_from_db = test_config["BLACKLIST_TOKEN"]
+expired_token = test_config["FAKE_TOKEN"]
 
 @pytest.fixture
 def client():
@@ -121,3 +122,9 @@ def test_register_user(client):
     response_body_logout = json.loads(response_logout.data)
 
     assert response_body_register["status"] == "success" and response_body_register["message"] == "Successfully registered." and response_body_logout["message"] == "Logged Out." and response_body_logout["status"] == "success"
+
+# 12 - Test /logout - Expired token
+def test_expired_token(client):
+    response = client.post("http://localhost:5003/logout?token=" + expired_token)
+    response_body = json.loads(response.data)
+    assert response_body["status"] == "fail" and response_body["message"] == 'Token Error: Token expired, please log in again.'

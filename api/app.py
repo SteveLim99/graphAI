@@ -49,70 +49,70 @@ def upload():
         if token_status:
             if 'file' not in request.files:
                 res["message"] = "Missing File"
-            file = request.files['file']
-            if file.filename == '':
-                res["message"] = "No Selected File"
-            if file and validateFileExtension(file.filename):
-                # file_name = open(os.path.join(
-                #     app.config['UPLOAD_FOLDER'], "file_name.txt"), 'w')
-                # file_name.write(file.filename)
-                # file_name.close()
-                file_name_hash = generateFileNameHash(file.filename, uid)
-                file_name = file_name_hash + "_input.png"
-                root = os.getcwd()
-                
-                file.save(os.path.join(
-                    app.config['UPLOAD_FOLDER'], file_name))
+            else:
+                file = request.files['file']
+                if file.filename == '':
+                    res["message"] = "No Selected File"
+                else:
+                    if file and validateFileExtension(file.filename):
+                        file_name_hash = generateFileNameHash(file.filename, uid)
+                        file_name = file_name_hash + "_input.png"
+                        root = os.getcwd()
+                        
+                        file.save(os.path.join(
+                            app.config['UPLOAD_FOLDER'], file_name))
 
-                imgd_entity = detect_image.ImageDetect(
-                    MODEL_NAME="new_graph_rcnn",
-                    PATH_TO_CKPT=root + "/entity_model/new_graph_rcnn/frozen_inference_graph.pb",
-                    PATH_TO_LABELS=root + "/entity_model/object-detection.pbtxt",
-                    NUM_CLASSES=3,
-                    EXPORT_PATH=app.config['DOWNLOAD_FOLDER'],
-                    IMAGE_PATH=app.config['UPLOAD_FOLDER'] + file_name,
-                    EXPORT_NAME=file_name_hash + "_ent"
-                )
+                        imgd_entity = detect_image.ImageDetect(
+                            MODEL_NAME="new_graph_rcnn",
+                            PATH_TO_CKPT=root + "/entity_model/new_graph_rcnn/frozen_inference_graph.pb",
+                            PATH_TO_LABELS=root + "/entity_model/object-detection.pbtxt",
+                            NUM_CLASSES=3,
+                            EXPORT_PATH=app.config['DOWNLOAD_FOLDER'],
+                            IMAGE_PATH=app.config['UPLOAD_FOLDER'] + file_name,
+                            EXPORT_NAME=file_name_hash + "_ent"
+                        )
 
-                imgd_arrow = detect_image.ImageDetect(
-                    MODEL_NAME="new_graph_rcnn",
-                    PATH_TO_CKPT=root + "/arrow_model/new_graph_arrow_rcnn/frozen_inference_graph.pb",
-                    PATH_TO_LABELS=root + "/arrow_model/object-detection.pbtxt",
-                    NUM_CLASSES=1,
-                    EXPORT_PATH=app.config['DOWNLOAD_FOLDER'],
-                    IMAGE_PATH=app.config['UPLOAD_FOLDER'] + file_name,
-                    EXPORT_NAME=file_name_hash + "_arr"
-                )
+                        imgd_arrow = detect_image.ImageDetect(
+                            MODEL_NAME="new_graph_rcnn",
+                            PATH_TO_CKPT=root + "/arrow_model/new_graph_arrow_rcnn/frozen_inference_graph.pb",
+                            PATH_TO_LABELS=root + "/arrow_model/object-detection.pbtxt",
+                            NUM_CLASSES=1,
+                            EXPORT_PATH=app.config['DOWNLOAD_FOLDER'],
+                            IMAGE_PATH=app.config['UPLOAD_FOLDER'] + file_name,
+                            EXPORT_NAME=file_name_hash + "_arr"
+                        )
 
-                imgd_arrow.predict()
-                imgd_entity.predict()
+                        imgd_arrow.predict()
+                        imgd_entity.predict()
 
-                Conv_nx = csv_to_networkx.CsvToNetworkx(
-                    CSV_PATH=app.config['DOWNLOAD_FOLDER'] + "/",
-                    fileName=file_name_hash)
-                G = Conv_nx.convert()
+                        Conv_nx = csv_to_networkx.CsvToNetworkx(
+                            CSV_PATH=app.config['DOWNLOAD_FOLDER'] + "/",
+                            fileName=file_name_hash)
+                        G = Conv_nx.convert()
 
-                prediction_path = app.config['DOWNLOAD_FOLDER'] + "/"
-                paths = os.listdir(prediction_path)
-                arrow_img = None
-                entity_img = None
-                networkx_img = None
-                for path in paths:
-                    if(path.endswith("_arr.png")):
-                        arrow_img = get_response_image(prediction_path + path)
-                    elif(path.endswith("_ent.png")):
-                        entity_img = get_response_image(prediction_path + path)
-                    elif(path.endswith("_nx.png")):
-                        networkx_img = get_response_image(
-                            prediction_path + path)
-                res = {
-                    'arrow_img': arrow_img,
-                    "entity_img": entity_img,
-                    "networkx_img": networkx_img,
-                    'file_name_hash': file_name_hash,
-                    "status": "success",
-                    "message": "RCNN Detection Succeeded."
-                }
+                        prediction_path = app.config['DOWNLOAD_FOLDER'] + "/"
+                        paths = os.listdir(prediction_path)
+                        arrow_img = None
+                        entity_img = None
+                        networkx_img = None
+                        for path in paths:
+                            if(path.endswith("_arr.png")):
+                                arrow_img = get_response_image(prediction_path + path)
+                            elif(path.endswith("_ent.png")):
+                                entity_img = get_response_image(prediction_path + path)
+                            elif(path.endswith("_nx.png")):
+                                networkx_img = get_response_image(
+                                    prediction_path + path)
+                        res = {
+                            'arrow_img': arrow_img,
+                            "entity_img": entity_img,
+                            "networkx_img": networkx_img,
+                            'file_name_hash': file_name_hash,
+                            "status": "success",
+                            "message": "RCNN Detection Succeeded."
+                        }
+                    else:
+                        res["message"] = "Invalid File Extension."
         else:
             res["message"] = token_msg
     except (Exception, psycopg2.DatabaseError) as error:
