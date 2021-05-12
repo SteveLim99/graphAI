@@ -5,6 +5,7 @@ import axios from "axios";
 import { LinearProgress } from '@material-ui/core';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import { AlertDialog } from "./AlertDialog"
 
 const Styles = styled.div`
 
@@ -41,25 +42,42 @@ export class FileUpload extends Component {
     super(props);
     this.state = {
       uploadedFile: null,
-      gcType: true,
+      gcType: false,
       fileUploadLabel: "Attach a File",
       title: "Insert File to Get Started",
-      gcTitle: "KSVM Image Classification"
+      gcTitle: "KSVM Image Classification",
+      dialog_open: false,
+      dialog: "Graph Neural Network is an Experimental Feature, Do You Wish to Continue?"
     }
   }
 
   handleGcChoice = () => {
-    if (this.state.gcType) {
+    if (!this.state.gcType) {
       this.setState({
-        gcType: false,
-        gcTitle: "Graph Neural Networks Graph Classification"
+        dialog_open: !this.state.dialog_open
       })
     } else {
       this.setState({
-        gcType: true,
+        gcType: false,
         gcTitle: "KSVM Image Classification"
       })
     }
+  }
+
+  handleClose = () => {
+    this.setState({
+      dialog_open: false,
+      gcType: false,
+      gcTitle: "KSVM Image Classification"
+    })
+  }
+
+  handleAccept = () => {
+    this.setState({
+      dialog_open: false,
+      gcType: true,
+      gcTitle: "Graph Neural Networks Graph Classification"
+    })
   }
 
   handleChanges = e => {
@@ -104,7 +122,7 @@ export class FileUpload extends Component {
     formData.append("file", uploadedFile);
 
     var gcChoice = "";
-    if (gcType === true) {
+    if (gcType === false) {
       gcChoice = "ksvm";
     } else {
       gcChoice = "gnn"
@@ -229,6 +247,12 @@ export class FileUpload extends Component {
   render() {
     return (
       <Styles>
+        <AlertDialog
+          open={this.state.dialog_open}
+          dialog={this.state.dialog}
+          handleClose={this.handleClose}
+          handleAccept={this.handleAccept}>
+        </AlertDialog>
         <Form className="form-container" id="form-group">
           <div id="child">
             <h3 className="form-title">{this.state.title}</h3>
@@ -257,7 +281,7 @@ export class FileUpload extends Component {
             </Form.Group>
             <Form.Row>
               <FormControlLabel
-                control={<Switch name="gcType" onChange={this.handleGcChoice} />}
+                control={<Switch name="gcType" checked={this.state.gcType} onChange={this.handleGcChoice} />}
                 label={this.state.gcTitle}
                 id='loading-gc-choice'
               />

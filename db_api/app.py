@@ -58,7 +58,7 @@ def connectToDB():
                     gid = graphs[pred]
                     file_name = ori_input_name
                     date = datetime.today().strftime('%Y-%m-%d  %H:%M:%S')
-                    statement = "INSERT INTO predictions(name, input_date, uid) VALUES(%s, TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS'), %s, %s) RETURNING id"
+                    statement = "INSERT INTO prediction(name, input_date, uid, gid) VALUES(%s, TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS'), %s, %s) RETURNING id"
                     cursor.execute(statement, (file_name, date, token_uid, gid,))
                     file_id = cursor.fetchone()[0]
 
@@ -230,7 +230,7 @@ def downloadFileFromDB():
                 token_uid = token_verification["uid"]
 
                 if token_status:
-                    statement = "SELECT %s FROM downloads where id = %s"
+                    statement = "SELECT %s FROM files where id = %s"
                     cursor.execute(statement, (AsIs(file), graph_id,))
                     bdata = cursor.fetchone()[0]
 
@@ -307,6 +307,7 @@ def deleteFileFromDB():
             break
         except(Exception, psycopg2.DatabaseError, ValueError) as error:
             print(error)
+            retries += 1
             if type(error).__name__ == "ValueError":
                 print("Value Provided is not of type Integer")
                 break

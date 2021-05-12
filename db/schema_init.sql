@@ -24,9 +24,9 @@ CREATE FUNCTION public.delete_prediction(input_id integer DEFAULT NULL::integer)
     LANGUAGE plpgsql
     AS $$
 	begin
-		DELETE FROM prediction where prediction.id = input_id;
 		DELETE FROM files where files.id = input_id;
 		DELETE FROM probability where probability.id = input_id;
+        DELETE FROM prediction where prediction.id = input_id;
 end;$$;
 
 
