@@ -88,35 +88,6 @@ export class DBTable extends Component {
         this.props.toggle();
     }
 
-    // handleDeleteFileButton = async (e, id) => {
-    //     e.preventDefault();
-    //     try {
-    //         var endpoint = "db/dbDeleteFile?id=" + id
-    //         endpoint += "&token=" + this.props.user_token
-    //         var res = await axios.post(
-    //             endpoint,
-    //             {}
-    //         )
-
-    //         if (res.status === 200) {
-    //             const deletedFile = res.data["status"]
-    //             const deletedFileMsg = res.data["message"]
-
-    //             if (deletedFile === "success") {
-    //                 this.props.resetTable();
-    //             } else {
-    //                 alert(deletedFileMsg);
-    //                 this.props.handleUserToken(null);
-    //                 this.props.logOutReset();
-    //             }
-
-    //         }
-    //     } catch (error) {
-    //         console.log(error)
-    //         alert("File delete error, check console for error message")
-    //     }
-    // }
-
     render() {
         const columns = [
             {
