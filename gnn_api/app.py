@@ -50,50 +50,53 @@ def upload():
             if gcType != None:
                 fname_hash = request.args.get("fname_hash")
                 if fname_hash != None:
-                    input_graph = nx.read_gml(
-                    app.config['PREDICTION_FILE_PATH'] + fname_hash + "_nx.gml")
-                    input_image = app.config['INPUT_FILE_PATH'] + \
-                        fname_hash + "_input.png"
+                    if os.path.exists(app.config['INPUT_FILE_PATH'] + fname_hash + "_input.png"):
+                        input_graph = nx.read_gml(
+                        app.config['PREDICTION_FILE_PATH'] + fname_hash + "_nx.gml")
+                        input_image = app.config['INPUT_FILE_PATH'] + \
+                            fname_hash + "_input.png"
 
-                    gnn_model = model.Classifier(1, 256, 2)
-                    gnn_model.load_state_dict(torch.load(app.config['GML_MODEL']))
+                        gnn_model = model.Classifier(1, 256, 2)
+                        gnn_model.load_state_dict(torch.load(app.config['GML_MODEL']))
 
-                    graph = dgl.from_networkx(input_graph)
-                    graph = dgl.add_self_loop(graph)
+                        graph = dgl.from_networkx(input_graph)
+                        graph = dgl.add_self_loop(graph)
 
-                    res = gnn_model(graph)
+                        res = gnn_model(graph)
 
-                    probs = torch.softmax(res, 1)
-                    sampled_Y = torch.multinomial(probs, 1)
-                    argmax_Y = torch.max(probs, 1)[1].view(-1, 1)
+                        probs = torch.softmax(res, 1)
+                        sampled_Y = torch.multinomial(probs, 1)
+                        argmax_Y = torch.max(probs, 1)[1].view(-1, 1)
 
-                    np_probs = probs.detach().numpy()[0]
-                    int_res = argmax_Y.numpy()[0][0]
+                        np_probs = probs.detach().numpy()[0]
+                        int_res = argmax_Y.numpy()[0][0]
 
-                    str_res = "BPNM"
-                    if int_res == 1:
-                        str_res = "Swimlane"
+                        str_res = "BPNM"
+                        if int_res == 1:
+                            str_res = "Swimlane"
 
-                    content = ""
-                    if str_res == "BPNM":
-                        with open(app.config['DOCUMENTATION_FILE'] + "bpnm.txt", "r") as f:
-                            content = f.read()
+                        content = ""
+                        if str_res == "BPNM":
+                            with open(app.config['DOCUMENTATION_FILE'] + "bpnm.txt", "r") as f:
+                                content = f.read()
+                        else:
+                            with open(app.config['DOCUMENTATION_FILE'] + "swimlane.txt", "r") as f:
+                                content = f.read()
+
+                        res = {
+                            'prediction': str_res,
+                            'prob_0': str(np_probs[0]),
+                            'probs_1': str(np_probs[-1]),
+                            'content': content,
+                            'status': 'success',
+                            'message': 'GNN Prediction Succesful'
+                        }
                     else:
-                        with open(app.config['DOCUMENTATION_FILE'] + "swimlane.txt", "r") as f:
-                            content = f.read()
-
-                    res = {
-                        'prediction': str_res,
-                        'prob_0': str(np_probs[0]),
-                        'probs_1': str(np_probs[-1]),
-                        'content': content,
-                        'status': 'success',
-                        'message': 'GNN Prediction Succesful'
-                    }
+                        res['message'] = "Invalid File Name Hash"
                 else:
-                    res['message'] = "Invalid parameter"
+                    res['message'] = "Missing parameter: File Name Hash"
             else:
-                res['message'] = "Invalid parameter"
+                res['message'] = "Missing parameter: Graph Classification Type"
         else:
             res = {
                 'status': 'fail',
@@ -101,11 +104,9 @@ def upload():
             }
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-        retries += 1
         res["message"] = error
         if conn:
             conn.rollback()
-        print("Retry Attempt: " + str(retries) + " / " + str(max_retry))
     finally:
         if conn:
             conn.close()
