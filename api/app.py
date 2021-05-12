@@ -7,6 +7,7 @@ from flask import Flask, flash, request, redirect, url_for, send_from_directory
 import detect_image
 import csv_to_networkx
 from lib.utils.login import verify_token
+from lib.utils.utils import deleteTemporaryFiles
 from dotenv import dotenv_values
 import psycopg2
 import hashlib
@@ -59,7 +60,7 @@ def upload():
                 file_name_hash = generateFileNameHash(file.filename, uid)
                 file_name = file_name_hash + "_input.png"
                 root = os.getcwd()
-
+                
                 file.save(os.path.join(
                     app.config['UPLOAD_FOLDER'], file_name))
 
