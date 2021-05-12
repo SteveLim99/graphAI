@@ -39,21 +39,21 @@ services:
   #     FLASK_ENV: development
   #   depends_on:
   #     - postgres
-  # api:
-  #   container_name: api
-  #   build: ./api
-  #   ports:
-  #     - "127.0.0.1:5000:5000"
-  #   volumes:
-  #     - ./api:/code
-  #     - ./data:/code/data
-  #     - ./env:/code/env
-  #     - ./lib:/code/lib
-  #     - ./test:/code/test
-  #   environment:
-  #     FLASK_ENV: production
-  #   depends_on:
-  #     - postgres
+  api:
+    container_name: api
+    build: ./api
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - ./api:/code
+      - ./data:/code/data
+      - ./env:/code/env
+      - ./lib:/code/lib
+      - ./test:/code/test
+    environment:
+      FLASK_ENV: production
+    depends_on:
+      - postgres
   login:
     container_name: login
     build: ./login
