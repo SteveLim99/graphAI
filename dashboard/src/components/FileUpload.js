@@ -47,7 +47,7 @@ export class FileUpload extends Component {
       title: "Insert File to Get Started",
       gcTitle: "KSVM Image Classification",
       dialog_open: false,
-      dialog: "Graph Neural Network is an Experimental Feature, Do You Wish to Continue?"
+      dialog: "Graph Neural Network Graph Classification is an Experimental Feature. Do You Want to Continue?"
     }
   }
 
@@ -236,7 +236,9 @@ export class FileUpload extends Component {
 
       this.setState({
         fileUploadLabel: "Attach a File",
-        title: "Insert File to Get Started"
+        title: "Insert File to Get Started",
+        gcType: false,
+        gcTitle: "KSVM Image Classification"
       })
       if (!this.props.open) {
         form.reset();

@@ -7,6 +7,7 @@ import Button from '@material-ui/core/Button';
 import { SearchBar } from './SearchBar';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteForeverRoundedIcon from '@material-ui/icons/DeleteForeverRounded';
+import { AlertDialog } from "./AlertDialog"
 
 const Styles = styled.div`
 
@@ -18,17 +19,32 @@ const Styles = styled.div`
 `;
 
 export class DBTable extends Component {
-
-    handleShowModalButton = (e, arr, ent, nx, pred, probs, context, id) => {
-        e.preventDefault();
-        this.props.handleImgChanges(arr, ent, nx);
-        this.props.handlePredictionChanges(pred, probs[0], probs[1], context)
-        this.props.handleRowID(id);
-        this.props.toggle();
+    constructor(props) {
+        super(props);
+        this.state = {
+            e: null,
+            id: null,
+            dialog_open: false,
+            dialog: "Are you sure that you want to detele this prediction?"
+        }
     }
 
-    handleDeleteFileButton = async (e, id) => {
+    handleClose = () => {
+        this.setState({
+            dialog_open: false,
+            e: null,
+            id: null
+        })
+    }
+
+    handleAccept = async () => {
+        const { e, id } = this.state
         e.preventDefault();
+        this.setState({
+            dialog_open: false,
+            e: null,
+            id: null
+        })
         try {
             var endpoint = "db/dbDeleteFile?id=" + id
             endpoint += "&token=" + this.props.user_token
@@ -55,6 +71,51 @@ export class DBTable extends Component {
             alert("File delete error, check console for error message")
         }
     }
+
+    handleDelete = (e, id) => {
+        this.setState({
+            dialog_open: true,
+            e: e,
+            id: id
+        })
+    }
+
+    handleShowModalButton = (e, arr, ent, nx, pred, probs, context, id) => {
+        e.preventDefault();
+        this.props.handleImgChanges(arr, ent, nx);
+        this.props.handlePredictionChanges(pred, probs[0], probs[1], context)
+        this.props.handleRowID(id);
+        this.props.toggle();
+    }
+
+    // handleDeleteFileButton = async (e, id) => {
+    //     e.preventDefault();
+    //     try {
+    //         var endpoint = "db/dbDeleteFile?id=" + id
+    //         endpoint += "&token=" + this.props.user_token
+    //         var res = await axios.post(
+    //             endpoint,
+    //             {}
+    //         )
+
+    //         if (res.status === 200) {
+    //             const deletedFile = res.data["status"]
+    //             const deletedFileMsg = res.data["message"]
+
+    //             if (deletedFile === "success") {
+    //                 this.props.resetTable();
+    //             } else {
+    //                 alert(deletedFileMsg);
+    //                 this.props.handleUserToken(null);
+    //                 this.props.logOutReset();
+    //             }
+
+    //         }
+    //     } catch (error) {
+    //         console.log(error)
+    //         alert("File delete error, check console for error message")
+    //     }
+    // }
 
     render() {
         const columns = [
@@ -118,7 +179,7 @@ export class DBTable extends Component {
                         className="collapse-icon"
                         color="inherit"
                         onClick={(e) => {
-                            this.handleDeleteFileButton(e, record.files_id)
+                            this.handleDelete(e, record.files_id)
                         }}
                     >
                         <DeleteForeverRoundedIcon fontSize='default' color='error' />
@@ -128,6 +189,12 @@ export class DBTable extends Component {
         ];
         return (
             <Styles>
+                <AlertDialog
+                    open={this.state.dialog_open}
+                    dialog={this.state.dialog}
+                    handleClose={this.handleClose}
+                    handleAccept={this.handleAccept}>
+                </AlertDialog>
                 <SearchBar
                     handleSearchKeyword={this.props.handleSearchKeyword}
                     handleSearchSelect={this.props.handleSearchSelect}
