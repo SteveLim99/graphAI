@@ -31,7 +31,7 @@ $ npm install --global yarn
 ```
 4. Skip to step 5 if you have already created the images 
 ```
-$ docker-compose -f docker-compose.prod.yml up 
+$ docker-compose -f docker-compose.prod.yml up --build
 $ docker-compose -f docker-compose.prod.yml down --volumes
 ```
 5. Finally, deploy the production environment
