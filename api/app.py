@@ -55,35 +55,25 @@ def upload():
                     res["message"] = "No Selected File"
                 else:
                     if file and validateFileExtension(file.filename):
-                        file_name_hash = generateFileNameHash(file.filename, uid)
+                        file_name_hash = generateFileNameHash(
+                            file.filename, uid)
                         file_name = file_name_hash + "_input.png"
                         root = os.getcwd()
-                        
+
                         file.save(os.path.join(
                             app.config['UPLOAD_FOLDER'], file_name))
 
-                        imgd_entity = detect_image.ImageDetect(
+                        imgd = detect_image.ImageDetect(
                             MODEL_NAME="new_graph_rcnn",
-                            PATH_TO_CKPT=root + "/entity_model/new_graph_rcnn/frozen_inference_graph.pb",
-                            PATH_TO_LABELS=root + "/entity_model/object-detection.pbtxt",
-                            NUM_CLASSES=3,
+                            PATH_TO_CKPT=root + "/cbd_model/model/frozen_inference_graph.pb",
+                            PATH_TO_LABELS=root + "/cbd_model/object-detection.pbtxt",
+                            NUM_CLASSES=4,
                             EXPORT_PATH=app.config['DOWNLOAD_FOLDER'],
                             IMAGE_PATH=app.config['UPLOAD_FOLDER'] + file_name,
-                            EXPORT_NAME=file_name_hash + "_ent"
+                            EXPORT_NAME=file_name_hash
                         )
 
-                        imgd_arrow = detect_image.ImageDetect(
-                            MODEL_NAME="new_graph_rcnn",
-                            PATH_TO_CKPT=root + "/arrow_model/new_graph_arrow_rcnn/frozen_inference_graph.pb",
-                            PATH_TO_LABELS=root + "/arrow_model/object-detection.pbtxt",
-                            NUM_CLASSES=1,
-                            EXPORT_PATH=app.config['DOWNLOAD_FOLDER'],
-                            IMAGE_PATH=app.config['UPLOAD_FOLDER'] + file_name,
-                            EXPORT_NAME=file_name_hash + "_arr"
-                        )
-
-                        imgd_arrow.predict()
-                        imgd_entity.predict()
+                        imgd.predict()
 
                         Conv_nx = csv_to_networkx.CsvToNetworkx(
                             CSV_PATH=app.config['DOWNLOAD_FOLDER'] + "/",
@@ -97,9 +87,11 @@ def upload():
                         networkx_img = None
                         for path in paths:
                             if(path.endswith("_arr.png")):
-                                arrow_img = get_response_image(prediction_path + path)
+                                arrow_img = get_response_image(
+                                    prediction_path + path)
                             elif(path.endswith("_ent.png")):
-                                entity_img = get_response_image(prediction_path + path)
+                                entity_img = get_response_image(
+                                    prediction_path + path)
                             elif(path.endswith("_nx.png")):
                                 networkx_img = get_response_image(
                                     prediction_path + path)
@@ -123,6 +115,8 @@ def upload():
     finally:
         if conn:
             conn.close()
+        if res["status"] == "fail":
+            deleteTemporaryFiles(app.config['UPLOAD_FOLDER'], app.config['DOWNLOAD_FOLDER'], fname_hash)
     return jsonify(res)
 
 

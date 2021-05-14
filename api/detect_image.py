@@ -68,11 +68,13 @@ class ImageDetect():
                     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                     # the array based representation of the image will be used later in order to prepare the
                     # result image with boxes and labels on it.
-                    image_np = cv2.resize(image, dsize=(
+                    image_ent = cv2.resize(image, dsize=(
                         800, 800), interpolation=cv2.INTER_CUBIC)
-                    # image_np = load_image_into_numpy_array(image)
+                    image_arr = cv2.resize(image, dsize=(
+                        800, 800), interpolation=cv2.INTER_CUBIC)
+                    # image_ent = load_image_into_numpy_array(image)
                     # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
-                    image_np_expanded = np.expand_dims(image_np, axis=0)
+                    image_ent_expanded = np.expand_dims(image_ent, axis=0)
                     image_tensor = detection_graph.get_tensor_by_name(
                         'image_tensor:0')
                     # Each box represents a part of the image where a particular object was detected.
@@ -89,30 +91,61 @@ class ImageDetect():
                     # Actual detection.
                     (boxes, scores, classes, num_detections) = sess.run(
                         [boxes, scores, classes, num_detections],
-                        feed_dict={image_tensor: image_np_expanded})
+                        feed_dict={image_tensor: image_ent_expanded})
                     # Visualization of the results of a detection.
+
+                    boxes, scores, classes = np.squeeze(
+                        boxes), np.squeeze(scores), np.squeeze(classes).astype(np.int32)
+
+                    ent_boxes, ent_scores, ent_classes = [], [], []
+                    arr_boxes, arr_scores, arr_classes = [], [], []
+
+                    for box, score, c in zip(boxes, scores, classes):
+                        if c == 1:
+                            arr_boxes.append(box)
+                            arr_scores.append(score)
+                            arr_classes.append(c)
+                        else:
+                            ent_boxes.append(box)
+                            ent_scores.append(score)
+                            ent_classes.append(c)
+
                     vis_util.visualize_boxes_and_labels_on_image_array(
-                        image_np,
-                        np.squeeze(boxes),
-                        np.squeeze(classes).astype(np.int32),
-                        np.squeeze(scores),
+                        image_ent,
+                        np.array(ent_boxes),
+                        np.array(ent_classes),
+                        np.array(ent_scores),
+                        category_index,
+                        use_normalized_coordinates=True,
+                        line_thickness=8)
+
+                    vis_util.visualize_boxes_and_labels_on_image_array(
+                        image_arr,
+                        np.array(arr_boxes),
+                        np.array(arr_classes),
+                        np.array(arr_scores),
                         category_index,
                         use_normalized_coordinates=True,
                         line_thickness=8)
 
                     plt.figure(figsize=self.IMAGE_SIZE)
                     # matplotlib is configured for command line only so we save the outputs instead
-                    plt.imshow(image_np)
+                    plt.imshow(image_ent)
                     # create an outputs folder for the images to be saved
                     plt.savefig(
-                        self.EXPORT_PATH + "/" + self.EXPORT_NAME + ".png")
+                        self.EXPORT_PATH + "/" + self.EXPORT_NAME + "_ent.png")
 
-                    height, width, _ = image_np.shape
+                    plt.imshow(image_arr)
+                    plt.savefig(
+                        self.EXPORT_PATH + "/" + self.EXPORT_NAME + "_arr.png"
+                    )
+
+                    height, width, _ = image_ent.shape
                     new_boxes = []
                     classes_list = np.squeeze(classes)
                     csv_writer.writerow(
                         ["class", "ymin", "xmin", "ymax", "xmax"])
-                    for j, box in enumerate(np.squeeze(boxes)):
+                    for j, box in enumerate(boxes):
                         if(np.squeeze(scores)[j] > 0.5):
                             box[0] = box[0] * height
                             box[1] = box[1] * width
@@ -127,3 +160,17 @@ class ImageDetect():
                             res.append(box[3])
                             new_boxes.append(res)
                             csv_writer.writerow(res)
+
+
+if __name__ == "__main__":
+    root = os.getcwd()
+    imgd_entity = ImageDetect(
+        MODEL_NAME="new_graph_rcnn",
+        PATH_TO_CKPT=root + "/cbd_model/model/frozen_inference_graph.pb",
+        PATH_TO_LABELS=root + "/cbd_model/object-detection.pbtxt",
+        NUM_CLASSES=4,
+        EXPORT_PATH=root + "/data/predictions/",
+        IMAGE_PATH=root + "/data/uploads/" + "test.png",
+        EXPORT_NAME="test"
+    )
+    imgd_entity.predict()

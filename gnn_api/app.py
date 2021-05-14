@@ -7,6 +7,7 @@ import model
 import networkx as nx
 from dotenv import dotenv_values
 from lib.utils.login import verify_token
+from lib.utils.utils import deleteTemporaryFiles
 import psycopg2
 
 jwt_config = dotenv_values("./env/jwt_secret.env")
@@ -110,5 +111,6 @@ def upload():
     finally:
         if conn:
             conn.close()
-
+        if res["status"] == "fail":
+            deleteTemporaryFiles(app.config['INPUT_FILE_PATH'], app.config['PREDICTION_FILE_PATH'], fname_hash)
     return jsonify(res)

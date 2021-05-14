@@ -138,6 +138,7 @@ secrets.py
 data/predictions/*
 api/arrow_model/
 api/entity_model/
+api/cbd_model/
 
 # vscode 
 .vscode

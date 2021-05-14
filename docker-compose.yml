@@ -13,17 +13,17 @@ services:
       - ./db/pgdata:/var/lib/postgresql/data
       - ./db/schema_init.sql:/docker-entrypoint-initdb.d/1_init.sql
       - ./db/data_init.sql:/docker-entrypoint-initdb.d/2_data_init.sql
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    env_file:
-      - ./env/pgadmin.env
-    ports:
-      - "8080:80"
-    depends_on:
-      - postgres
-    logging:
-      driver: "none"
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pgadmin
+  #   env_file:
+  #     - ./env/pgadmin.env
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     - postgres
+  #   logging:
+  #     driver: "none"
   db_api:
     container_name: db_api
     build: ./db_api
@@ -39,21 +39,21 @@ services:
       FLASK_ENV: development
     depends_on:
       - postgres
-  # api:
-  #   container_name: api
-  #   build: ./api
-  #   ports:
-  #     - "127.0.0.1:5000:5000"
-  #   volumes:
-  #     - ./api:/code
-  #     - ./data:/code/data
-  #     - ./env:/code/env
-  #     - ./lib:/code/lib
-  #     - ./test:/code/test
-  #   environment:
-  #     FLASK_ENV: development
-  #   depends_on:
-  #     - postgres
+  api:
+    container_name: api
+    build: ./api
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - ./api:/code
+      - ./data:/code/data
+      - ./env:/code/env
+      - ./lib:/code/lib
+      - ./test:/code/test
+    environment:
+      FLASK_ENV: development
+    depends_on:
+      - postgres
   login:
     container_name: login
     build: ./login
@@ -68,35 +68,35 @@ services:
       FLASK_ENV: development
     depends_on:
       - postgres
-  # gnn_api:
-  #   container_name: gnn_api
-  #   build: ./gnn_api
-  #   ports:
-  #     - "127.0.0.1:5001:5001"
-  #   volumes:
-  #     - ./gnn_api:/code
-  #     - ./data:/code/data
-  #     - ./env:/code/env
-  #     - ./lib:/code/lib
-  #     - ./test:/code/test
-  #   environment:
-  #     FLASK_ENV: development
-  #   depends_on:
-  #     - postgres
-  #     - api
-  # frontend:
-  #   container_name: frontend
-  #   build: ./dashboard
-  #   volumes:
-  #     - ./dashboard:/app
-  #     - /app/node_modules
-  #   ports:
-  #     - 3000:3000
-  #   environment:
-  #     - CHOKIDAR_USEPOLLING=true
-  #   depends_on:
-  #     - postgres
-  #     - api
-  #     - gnn_api
-  #     - db_api
-  #     - login
+  gnn_api:
+    container_name: gnn_api
+    build: ./gnn_api
+    ports:
+      - "127.0.0.1:5001:5001"
+    volumes:
+      - ./gnn_api:/code
+      - ./data:/code/data
+      - ./env:/code/env
+      - ./lib:/code/lib
+      - ./test:/code/test
+    environment:
+      FLASK_ENV: development
+    depends_on:
+      - postgres
+      - api
+  frontend:
+    container_name: frontend
+    build: ./dashboard
+    volumes:
+      - ./dashboard:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - postgres
+      - api
+      - gnn_api
+      - db_api
+      - login
