@@ -1,11 +1,12 @@
-import pytest
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from lib.utils.login import verify_token, check_if_exist, is_blacklist_token
-import psycopg2
-from dotenv import dotenv_values
-import json
 from app import app
+import json
+from dotenv import dotenv_values
+import psycopg2
+from lib.utils.login import verify_token, check_if_exist, is_blacklist_token
+import pytest
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 jwt_config = dotenv_values("./env/jwt_secret.env")
 database_config = dotenv_values("./env/database.env")
@@ -26,6 +27,10 @@ test_email = test_config["EXISTING_EMAIL"]
 test_pin = test_config["EXISTING_PIN"]
 blacklisted_token_from_db = test_config["BLACKLIST_TOKEN"]
 expired_token = test_config["FAKE_TOKEN"]
+fake_user = test_config["FAKE_USER"]
+fake_user_pw = test_config["FAKE_USER_PW"]
+fake_user_email = test_config["FAKE_USER_EMAIL"]
+
 
 @pytest.fixture
 def client():
@@ -34,76 +39,100 @@ def client():
         yield client
 
 # 1 - No token
+
+
 def test_no_token():
     res = verify_token(None, None, None)
     assert res == {'status': False, 'message': 'Token Not Found.', 'uid': None}
 
 # 2 - Test if user exist
+
+
 def test_exist_user():
     conn = psycopg2.connect(
-            host=database_config["POSTGRES_HOST"],
-            database=database_config["POSTGRES_DB"],
-            user=database_config["POSTGRES_USER"],
-            password=database_config["POSTGRES_PASSWORD"]
-        )
+        host=database_config["POSTGRES_HOST"],
+        database=database_config["POSTGRES_DB"],
+        user=database_config["POSTGRES_USER"],
+        password=database_config["POSTGRES_PASSWORD"]
+    )
     cursor = conn.cursor()
     res = check_if_exist(cursor, 100, "lol", test_email)
     assert res == True
 
 # 3 - Test a non blacklist token
+
+
 def test_is_not_blacklist_token():
     conn = psycopg2.connect(
-            host=database_config["POSTGRES_HOST"],
-            database=database_config["POSTGRES_DB"],
-            user=database_config["POSTGRES_USER"],
-            password=database_config["POSTGRES_PASSWORD"]
-        )
+        host=database_config["POSTGRES_HOST"],
+        database=database_config["POSTGRES_DB"],
+        user=database_config["POSTGRES_USER"],
+        password=database_config["POSTGRES_PASSWORD"]
+    )
     cursor = conn.cursor()
     res = is_blacklist_token(cursor, "fake token")
     assert res == {
-            'status': False,
-            'message': "Token Verified."
-        }
+        'status': False,
+        'message': "Token Verified."
+    }
 
 # 4 - Test a blacklisted token
+
+
 def test_is_blacklist_token(client):
-    response = client.post("http://localhost:5003/logout?token=" + blacklisted_token_from_db)
+    response = client.post(
+        "http://localhost:5003/logout?token=" + blacklisted_token_from_db)
     response_body = json.loads(response.data)
     assert response_body["status"] == 'fail' and response_body["message"] == "Token Blacklisted."
 
 # 5 - Test /registerUser - Existing user
+
+
 def test_register_existing_user(client):
-    response = client.post("http://localhost:5003/registerUser?uname=" + test_user + "&email=" + test_email + "&pw=" + test_pin)
+    response = client.post("http://localhost:5003/registerUser?uname=" +
+                           test_user + "&email=" + test_email + "&pw=" + test_pin)
     response_body = json.loads(response.data)
-    assert response_body == {'auth_token': None, 'message': 'user name or email taken.', 'status': 'fail'}
+    assert response_body == {
+        'auth_token': None, 'message': 'user name or email taken.', 'status': 'fail'}
 
 # 6 - Test /login - Invalid PW
+
+
 def test_invalid_pw(client):
-    response = client.get("http://localhost:5003/login?uname=" + test_user + "&pw=fakepassword")
+    response = client.get(
+        "http://localhost:5003/login?uname=" + test_user + "&pw=fakepassword")
     response_body = json.loads(response.data)
     assert response_body == {
-                    'status': 'fail',
-                    'message': 'Incorrect Password.',
-                    'auth_token': None
-                }
+        'status': 'fail',
+        'message': 'Incorrect Password.',
+        'auth_token': None
+    }
 
 # 7 - Test /login - Invalid user
+
+
 def test_invalid_user(client):
-    response = client.get("http://localhost:5003/login?uname=fakeuser&pw=fakepassword")
+    response = client.get(
+        "http://localhost:5003/login?uname=fakeuser&pw=fakepassword")
     response_body = json.loads(response.data)
     assert response_body == {
-                    'status': 'fail',
-                    'message': 'User does not exist.',
-                    'auth_token': None
-                }
+        'status': 'fail',
+        'message': 'User does not exist.',
+        'auth_token': None
+    }
 
 # 8 - Test /login - Succesful user login
+
+
 def test_valid_user(client):
-    response = client.get("http://localhost:5003/login?uname=" + test_user + "&pw=" + test_pin)
+    response = client.get(
+        "http://localhost:5003/login?uname=" + test_user + "&pw=" + test_pin)
     response_body = json.loads(response.data)
     assert response_body["status"] == "success" and response_body["message"] == "Logged in"
 
 # 9 - Test /logout - Unsuccesful log out due to no token
+
+
 def test_logout_no_token(client):
     response = client.post("http://localhost:5003/logout?token")
     response_body = json.loads(response.data)
@@ -113,18 +142,26 @@ def test_logout_no_token(client):
 # 11 - Test /logout - Succesful Log out
 # 10 and 11 were combined to utilize the token generated upon registration
 # WARNING: PLEASE DELETE USER AFTER USAGE
+
+
 def test_register_user(client):
-    response_register = client.post("http://localhost:5003/registerUser?uname=unittest&email=unittest@gmail.com&pw=unittest")
+    response_register = client.post(
+        "http://localhost:5003/registerUser?uname=" + fake_user + "&email=" + fake_user_email + "&pw=" + fake_user_pw)
     response_body_register = json.loads(response_register.data)
     mock_token_to_be_blacklisted = response_body_register["auth_token"]
 
-    response_logout = client.post("http://localhost:5003/logout?token=" + str(mock_token_to_be_blacklisted))
+    response_logout = client.post(
+        "http://localhost:5003/logout?token=" + str(mock_token_to_be_blacklisted))
     response_body_logout = json.loads(response_logout.data)
 
-    assert response_body_register["status"] == "success" and response_body_register["message"] == "Successfully registered." and response_body_logout["message"] == "Logged Out." and response_body_logout["status"] == "success"
+    assert response_body_register["status"] == "success" and response_body_register[
+        "message"] == "Successfully registered." and response_body_logout["message"] == "Logged Out." and response_body_logout["status"] == "success"
 
 # 12 - Test /logout - Expired token
+
+
 def test_expired_token(client):
-    response = client.post("http://localhost:5003/logout?token=" + expired_token)
+    response = client.post(
+        "http://localhost:5003/logout?token=" + expired_token)
     response_body = json.loads(response.data)
     assert response_body["status"] == "fail" and response_body["message"] == 'Token Error: Token expired, please log in again.'
