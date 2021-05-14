@@ -7,3 +7,4 @@ python-dotenv==0.17.0
 psycopg2
 coverage
 pytest
+pickle

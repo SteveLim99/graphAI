@@ -4,11 +4,13 @@ from flask import jsonify
 import torch
 import dgl
 import model
+import ksvm
 import networkx as nx
 from dotenv import dotenv_values
 from lib.utils.login import verify_token
 from lib.utils.utils import deleteTemporaryFiles
 import psycopg2
+import pickle
 
 jwt_config = dotenv_values("./env/jwt_secret.env")
 database_config = dotenv_values("./env/database.env")
@@ -51,47 +53,59 @@ def upload():
             if gcType != None:
                 fname_hash = request.args.get("fname_hash")
                 if fname_hash != None:
-                    if os.path.exists(app.config['INPUT_FILE_PATH'] + fname_hash + "_input.png"):
+                    if os.path.exists(app.config['INPUT_FILE_PATH'] + fname_hash + "_input.png") and os.path.exists(app.config['PREDICTION_FILE_PATH'] + fname_hash + "_nx.gml"):
+
                         input_graph = nx.read_gml(
-                        app.config['PREDICTION_FILE_PATH'] + fname_hash + "_nx.gml")
+                            app.config['PREDICTION_FILE_PATH'] + fname_hash + "_nx.gml")
+
                         input_image = app.config['INPUT_FILE_PATH'] + \
                             fname_hash + "_input.png"
 
-                        gnn_model = model.Classifier(1, 256, 2)
-                        gnn_model.load_state_dict(torch.load(app.config['GML_MODEL']))
+                        if gcType == "ksvm" or gcType == "gnn":
+                            int_res = 0
+                            
+                            if gcType == "gnn":
+                                gnn_model = model.Classifier(1, 256, 2)
+                                gnn_model.load_state_dict(torch.load(app.config['GML_MODEL']))
 
-                        graph = dgl.from_networkx(input_graph)
-                        graph = dgl.add_self_loop(graph)
+                                graph = dgl.from_networkx(input_graph)
+                                graph = dgl.add_self_loop(graph)
 
-                        res = gnn_model(graph)
+                                res = gnn_model(graph)
 
-                        probs = torch.softmax(res, 1)
-                        sampled_Y = torch.multinomial(probs, 1)
-                        argmax_Y = torch.max(probs, 1)[1].view(-1, 1)
+                                probs = torch.softmax(res, 1)
+                                sampled_Y = torch.multinomial(probs, 1)
+                                argmax_Y = torch.max(probs, 1)[1].view(-1, 1)
 
-                        np_probs = probs.detach().numpy()[0]
-                        int_res = argmax_Y.numpy()[0][0]
+                                np_probs = probs.detach().numpy()[0]
+                                int_res = argmax_Y.numpy()[0][0]
 
-                        str_res = "BPNM"
-                        if int_res == 1:
-                            str_res = "Swimlane"
+                            elif gcType == "ksvm":
+                                ksvm = ksvm.ksvmClassifier(input_image)
+                                int_res = ksvm.predict()
+                            
+                            str_res = "BPNM"
+                            if int_res == 1:
+                                str_res = "Swimlane"
 
-                        content = ""
-                        if str_res == "BPNM":
-                            with open(app.config['DOCUMENTATION_FILE'] + "bpnm.txt", "r") as f:
-                                content = f.read()
+                            content = ""
+                            if str_res == "BPNM":
+                                with open(app.config['DOCUMENTATION_FILE'] + "bpnm.txt", "r") as f:
+                                    content = f.read()
+                            else:
+                                with open(app.config['DOCUMENTATION_FILE'] + "swimlane.txt", "r") as f:
+                                    content = f.read()
+
+                            res = {
+                                'prediction': str_res,
+                                'prob_0': str(np_probs[0]),
+                                'probs_1': str(np_probs[-1]),
+                                'content': content,
+                                'status': 'success',
+                                'message': 'GNN Prediction Succesful'
+                            }
                         else:
-                            with open(app.config['DOCUMENTATION_FILE'] + "swimlane.txt", "r") as f:
-                                content = f.read()
-
-                        res = {
-                            'prediction': str_res,
-                            'prob_0': str(np_probs[0]),
-                            'probs_1': str(np_probs[-1]),
-                            'content': content,
-                            'status': 'success',
-                            'message': 'GNN Prediction Succesful'
-                        }
+                            res['message'] = "Invalid Graph Classification Type."
                     else:
                         res['message'] = "Invalid File Name Hash"
                 else:
