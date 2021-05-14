@@ -8,9 +8,10 @@ import numpy as np
 
 class ksvmClassifier():
 
-    def __init__(self, input_path):
+    def __init__(self, input_path, model_location):
         img = Image.open(input_path)
         self.data = np.asarray(img)
+        self.model_location = model_location
 
     def extract_features(self):
         color_features = img.flatten()
@@ -28,6 +29,6 @@ class ksvmClassifier():
 
     def predict(self):
         reduced_f = self.convert()
-        ksvm = pickle.load(open(ksvm_model, 'rb'))
+        ksvm = pickle.load(open(model_location, 'rb'))
         res = ksvm.predict(reduced_f)
         return res

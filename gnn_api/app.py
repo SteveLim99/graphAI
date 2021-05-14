@@ -18,6 +18,8 @@ database_config = dotenv_values("./env/database.env")
 app = Flask(__name__)
 GML_MODEL = os.getcwd() + "/gcn_model"
 app.config['GML_MODEL'] = GML_MODEL
+KSVM_MODEL = os.getcwd() + "/ksvm_model"
+app.config['KSVM_MODEL'] = KSVM_MODEL
 PREDICTION_FILE_PATH = os.getcwd() + "/data/predictions/"
 app.config['PREDICTION_FILE_PATH'] = PREDICTION_FILE_PATH
 INPUT_FILE_PATH = os.getcwd() + "/data/uploads/"
@@ -81,7 +83,7 @@ def upload():
                                 int_res = argmax_Y.numpy()[0][0]
 
                             elif gcType == "ksvm":
-                                ksvm = ksvm.ksvmClassifier(input_image)
+                                ksvm = ksvm.ksvmClassifier(input_image, app.config['KSVM_MODEL'])
                                 int_res = ksvm.predict()
                             
                             str_res = "BPNM"
