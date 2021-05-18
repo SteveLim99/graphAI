@@ -1,0 +1,14 @@
+item {
+    id: 1
+    name: 'process'
+}
+
+item {
+    id: 2
+    name: 'decision'
+}
+
+item {
+    id: 3
+    name: 'terminator'
+}
