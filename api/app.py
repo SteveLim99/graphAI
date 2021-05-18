@@ -121,12 +121,11 @@ def upload():
 
 
 def get_response_image(image_path):
-    pil_img = Image.open(image_path, mode='r')  # reads the PIL image
+    pil_img = Image.open(image_path, mode='r')  
     byte_arr = io.BytesIO()
-    # convert the PIL image to byte array
     pil_img.save(byte_arr, format='PNG')
     encoded_img = encodebytes(byte_arr.getvalue()).decode(
-        'ascii')  # encode as base64
+        'ascii') 
     return encoded_img
 
 

@@ -43,7 +43,7 @@ def test_invalid_fname_hash(client):
     assert response_body["status"] == 'fail' and response_body["message"] == "Invalid File Name Hash"
 
 # 5 - invalid gc type
-def test_invalid_fname_hash(client):
+def test_invalid_gcType(client):
     response = client.post("http://localhost:5001/gmlUpload?token=" + token + "&gcType=" + "fklasdhj" + "&fname_hash=" + "c5de9aaad16560271fd655dfede5cb841d74c100")
     response_body = json.loads(response.data)
     assert response_body["status"] == 'fail' and response_body["message"] == "Invalid Graph Classification Type."

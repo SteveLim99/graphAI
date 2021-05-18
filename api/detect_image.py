@@ -63,36 +63,26 @@ class ImageDetect():
                 with open(self.EXPORT_PATH + "/" + self.EXPORT_NAME + ".csv", "w") as out_file:
                     csv_writer = csv.writer(out_file)
                     image_path = self.IMAGE_PATH
-                    # image = Image.open(image_path)
                     image = cv2.imread(image_path)
                     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                    # the array based representation of the image will be used later in order to prepare the
-                    # result image with boxes and labels on it.
                     image_ent = cv2.resize(image, dsize=(
                         800, 800), interpolation=cv2.INTER_CUBIC)
                     image_arr = cv2.resize(image, dsize=(
                         800, 800), interpolation=cv2.INTER_CUBIC)
-                    # image_ent = load_image_into_numpy_array(image)
-                    # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
                     image_ent_expanded = np.expand_dims(image_ent, axis=0)
                     image_tensor = detection_graph.get_tensor_by_name(
                         'image_tensor:0')
-                    # Each box represents a part of the image where a particular object was detected.
                     boxes = detection_graph.get_tensor_by_name(
                         'detection_boxes:0')
-                    # Each score represent how level of confidence for each of the objects.
-                    # Score is shown on the result image, together with the class label.
                     scores = detection_graph.get_tensor_by_name(
                         'detection_scores:0')
                     classes = detection_graph.get_tensor_by_name(
                         'detection_classes:0')
                     num_detections = detection_graph.get_tensor_by_name(
                         'num_detections:0')
-                    # Actual detection.
                     (boxes, scores, classes, num_detections) = sess.run(
                         [boxes, scores, classes, num_detections],
                         feed_dict={image_tensor: image_ent_expanded})
-                    # Visualization of the results of a detection.
 
                     boxes, scores, classes = np.squeeze(
                         boxes), np.squeeze(scores), np.squeeze(classes).astype(np.int32)
@@ -129,9 +119,7 @@ class ImageDetect():
                         line_thickness=8)
 
                     plt.figure(figsize=self.IMAGE_SIZE)
-                    # matplotlib is configured for command line only so we save the outputs instead
                     plt.imshow(image_ent)
-                    # create an outputs folder for the images to be saved
                     plt.savefig(
                         self.EXPORT_PATH + "/" + self.EXPORT_NAME + "_ent.png")
 

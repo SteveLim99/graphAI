@@ -48,16 +48,12 @@ def test_no_token():
 # 2 - Test if user exist
 
 
-def test_exist_user():
-    conn = psycopg2.connect(
-        host=database_config["POSTGRES_HOST"],
-        database=database_config["POSTGRES_DB"],
-        user=database_config["POSTGRES_USER"],
-        password=database_config["POSTGRES_PASSWORD"]
-    )
-    cursor = conn.cursor()
-    res = check_if_exist(cursor, 100, "lol", test_email)
-    assert res == True
+def test_register_existing_email(client):
+    response = client.post("http://localhost:5003/registerUser?uname=" +
+                           "asd" + "&email=" + test_email + "&pw=" + test_pin)
+    response_body = json.loads(response.data)
+    assert response_body == {
+        'auth_token': None, 'message': 'user name or email taken.', 'status': 'fail'}
 
 # 3 - Test a non blacklist token
 
@@ -90,7 +86,7 @@ def test_is_blacklist_token(client):
 
 def test_register_existing_user(client):
     response = client.post("http://localhost:5003/registerUser?uname=" +
-                           test_user + "&email=" + test_email + "&pw=" + test_pin)
+                           test_user + "&email=" + "asd" + "&pw=" + test_pin)
     response_body = json.loads(response.data)
     assert response_body == {
         'auth_token': None, 'message': 'user name or email taken.', 'status': 'fail'}
