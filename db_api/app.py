@@ -3,7 +3,7 @@ from psycopg2.extensions import AsIs
 from flask import Flask, flash, request, redirect, url_for, send_file
 import os
 import io
-import base64 
+import base64
 from PIL import Image
 from data.graphs import graphs
 from datetime import datetime
@@ -60,7 +60,8 @@ def connectToDB():
                     file_name = ori_input_name
                     date = datetime.today().strftime('%Y-%m-%d  %H:%M:%S')
                     statement = "INSERT INTO prediction(name, input_date, uid, gid) VALUES(%s, TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS'), %s, %s) RETURNING id"
-                    cursor.execute(statement, (file_name, date, token_uid, gid,))
+                    cursor.execute(
+                        statement, (file_name, date, token_uid, gid,))
                     file_id = cursor.fetchone()[0]
 
                     statement = "INSERT INTO probability(id, gid, prob) VALUES(%s, %s, %s)"
@@ -83,16 +84,21 @@ def connectToDB():
 
                         conn.commit()
                         processed = True
-                        deleteTemporaryFiles(app.config['UPLOAD_FOLDER'], app.config['DOWNLOAD_FOLDER'], fname_hash)
+                        deleteTemporaryFiles(
+                            app.config['UPLOAD_FOLDER'], app.config['DOWNLOAD_FOLDER'], fname_hash)
                         res = {"fileUploaded": str(processed),
-                            "graphID": str(file_id),
-                            "status": "success",
-                            "message": "Upload Succesful"}
+                               "graphID": str(file_id),
+                               "status": "success",
+                               "message": "Upload Succesful"}
                     else:
                         res = {
                             "status": "fail",
                             "message": "File not present in file system."
                         }
+
+                    if res["status"] == "fail" and fname_hash != None:
+                        deleteTemporaryFiles(
+                            app.config['UPLOAD_FOLDER'], app.config['DOWNLOAD_FOLDER'], fname_hash)
                     break
 
                 elif request.method == 'GET':
@@ -225,7 +231,7 @@ def downloadFileFromDB():
                     if file_type == '2':
                         file = "nx_file"
                         filename += "nx_obj.gml"
-                    
+
                     conn = psycopg2.connect(
                         host=database_config["POSTGRES_HOST"],
                         database=database_config["POSTGRES_DB"],
@@ -276,9 +282,9 @@ def downloadFileFromDB():
                 }
     else:
         res = {
-                'status': 'fail',
-                'message': "Missing Parameters"
-            }
+            'status': 'fail',
+            'message': "Missing Parameters"
+        }
     if conn:
         conn.close()
     return res
@@ -307,7 +313,7 @@ def deleteFileFromDB():
                     password=database_config["POSTGRES_PASSWORD"]
                 )
                 cursor = conn.cursor()
-                
+
                 token_verification = verify_token(
                     token, cursor, jwt_config["SECRET_KEY"])
                 token_status = token_verification["status"]
@@ -343,7 +349,7 @@ def deleteFileFromDB():
                 if conn:
                     conn.rollback()
                     print("Retry Attempt: " + str(retries) +
-                        " / " + str(max_retry))
+                          " / " + str(max_retry))
                 time.sleep(5)
                 res = {
                     'status': 'fail',
@@ -357,6 +363,7 @@ def deleteFileFromDB():
     if conn:
         conn.close()
     return res
+
 
 def readFiles(fileName):
     arr_fin, ent_fin, nx_fin, nx_png_fin = None, None, None, None

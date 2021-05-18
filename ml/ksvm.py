@@ -149,6 +149,9 @@ swim_std_test = ss.fit_transform(swim_test)
 pca_swim_test = PCA(n_components=32)
 swim_test = pca_swim_test.fit_transform(swim_std_test)
 
+pickle.dump(ss, open("/content/gdrive/My Drive/TF/models/research/object_detection/trained_models/standardScalar.pkl", 'wb'))
+pickle.dump(pca_bpnm_train, open("/content/gdrive/My Drive/TF/models/research/object_detection/trained_models/pca.pkl", 'wb'))
+
 bpnm_train_y = [1 for i in range(len(bpnm_train))]
 bpnm_test_y = [1 for i in range(len(bpnm_test))]
 

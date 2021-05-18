@@ -141,3 +141,8 @@ api/cbd_model/
 
 # vscode 
 .vscode
+
+# ksvm
+gnn_api/ksvm_model.sav
+gnn_api/pca.pkl
+gnn_api/standardScalar.pkl

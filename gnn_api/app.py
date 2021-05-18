@@ -18,8 +18,6 @@ database_config = dotenv_values("./env/database.env")
 app = Flask(__name__)
 GML_MODEL = os.getcwd() + "/gcn_model"
 app.config['GML_MODEL'] = GML_MODEL
-KSVM_MODEL = os.getcwd() + "/ksvm_model"
-app.config['KSVM_MODEL'] = KSVM_MODEL
 PREDICTION_FILE_PATH = os.getcwd() + "/data/predictions/"
 app.config['PREDICTION_FILE_PATH'] = PREDICTION_FILE_PATH
 INPUT_FILE_PATH = os.getcwd() + "/data/uploads/"
@@ -31,6 +29,7 @@ app.config['DOCUMENTATION_FILE'] = DOCUMENTATION_FILE
 @app.route('/gmlUpload', methods=['POST'])
 def upload():
     conn = None
+    fname_hash = None
     res = {
         'status': 'fail',
         'message': ''
@@ -65,10 +64,11 @@ def upload():
 
                         if gcType == "ksvm" or gcType == "gnn":
                             int_res = 0
-                            
+
                             if gcType == "gnn":
                                 gnn_model = model.Classifier(1, 256, 2)
-                                gnn_model.load_state_dict(torch.load(app.config['GML_MODEL']))
+                                gnn_model.load_state_dict(
+                                    torch.load(app.config['GML_MODEL']))
 
                                 graph = dgl.from_networkx(input_graph)
                                 graph = dgl.add_self_loop(graph)
@@ -83,9 +83,12 @@ def upload():
                                 int_res = argmax_Y.numpy()[0][0]
 
                             elif gcType == "ksvm":
-                                ksvm = ksvm.ksvmClassifier(input_image, app.config['KSVM_MODEL'])
-                                int_res = ksvm.predict()
-                            
+                                ksvm_model = ksvm.ksvmClassifier(
+                                    input_image)
+                                np_probs = ksvm_model.predict()
+                                if np_probs[0] > np_probs[-1]:
+                                    int_res = 1
+
                             str_res = "BPNM"
                             if int_res == 1:
                                 str_res = "Swimlane"
@@ -127,6 +130,7 @@ def upload():
     finally:
         if conn:
             conn.close()
-        if res["status"] == "fail":
-            deleteTemporaryFiles(app.config['INPUT_FILE_PATH'], app.config['PREDICTION_FILE_PATH'], fname_hash)
+        if res["status"] == "fail" and fname_hash != None:
+            deleteTemporaryFiles(
+                app.config['INPUT_FILE_PATH'], app.config['PREDICTION_FILE_PATH'], fname_hash)
     return jsonify(res)

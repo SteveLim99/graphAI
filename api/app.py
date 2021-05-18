@@ -27,6 +27,7 @@ app.config['DOWNLOAD_FOLDER'] = DOWNLOAD_FOLDER
 @app.route('/fileUpload', methods=['POST'])
 def upload():
     conn = None
+    file_name_hash = None
     res = {
         'status': 'fail',
         'message': ''
@@ -115,17 +116,18 @@ def upload():
     finally:
         if conn:
             conn.close()
-        if res["status"] == "fail":
-            deleteTemporaryFiles(app.config['UPLOAD_FOLDER'], app.config['DOWNLOAD_FOLDER'], fname_hash)
+        if res["status"] == "fail" and file_name_hash != None:
+            deleteTemporaryFiles(
+                app.config['UPLOAD_FOLDER'], app.config['DOWNLOAD_FOLDER'], file_name_hash)
     return jsonify(res)
 
 
 def get_response_image(image_path):
-    pil_img = Image.open(image_path, mode='r')  
+    pil_img = Image.open(image_path, mode='r')
     byte_arr = io.BytesIO()
     pil_img.save(byte_arr, format='PNG')
     encoded_img = encodebytes(byte_arr.getvalue()).decode(
-        'ascii') 
+        'ascii')
     return encoded_img
 
 
